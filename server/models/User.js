@@ -25,5 +25,13 @@ UserSchema.pre("save", async function (next) {
   }
 });
 
+UserSchema.methods.isValidPassword = async function (password) {
+  try {
+    return await argon2.verify(this.password, password);
+  } catch (error) {
+    throw error;
+  }
+};
+
 const User = mongoose.model("user", UserSchema);
 module.exports = User;

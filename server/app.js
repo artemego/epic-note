@@ -9,6 +9,10 @@ const AuthRoute = require("./routes/Auth");
 const app = express();
 app.use(morgan("dev"));
 
+// handle json/form req body
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.get("/", async (req, res, next) => {
   res.send("Hello from express");
 });

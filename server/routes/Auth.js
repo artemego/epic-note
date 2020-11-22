@@ -8,6 +8,7 @@ const {
   signRefreshToken,
   verifyRefreshToken,
 } = require("../helpers/jwt_helper");
+const client = require("../helpers/init_redis");
 
 router.post("/register", async (req, res, next) => {
   try {
@@ -69,7 +70,21 @@ router.post("/refresh-token", async (req, res, next) => {
 });
 
 router.delete("/logout", async (req, res, next) => {
-  res.send("logout route");
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) throw createHttpError.BadRequest();
+    const userId = await verifyRefreshToken(refreshToken);
+    client.DEL(userId, (err, val) => {
+      if (err) {
+        console.log(err.message);
+        throw createHttpError.InternalServerError();
+      }
+      console.log(val);
+      res.sendStatus(204);
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;

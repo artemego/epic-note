@@ -1,15 +1,19 @@
 const express = require("express");
 const morgan = require("morgan");
 const createError = require("http-errors");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 require("./helpers/init_mongodb");
-const { verifyAccessToken } = require("./helpers/jwt_helper");
 require("./helpers/init_redis");
+const { verifyAccessToken } = require("./helpers/jwt_helper");
 
 const AuthRoute = require("./routes/Auth");
 
 const app = express();
 app.use(morgan("dev"));
+
+// подключаем cookie-parser middleware для работы с cookies
+app.use(cookieParser());
 
 // handle json/form req body
 app.use(express.json());
@@ -20,6 +24,7 @@ app.get("/", verifyAccessToken, async (req, res, next) => {
   res.send("Hello from express");
 });
 
+// ROUTES
 app.use("/auth", AuthRoute);
 
 // path not found error

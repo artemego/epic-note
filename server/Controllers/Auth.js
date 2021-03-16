@@ -12,13 +12,16 @@ const client = require("../helpers/init_redis");
 module.exports = {
   register: async (req, res, next) => {
     try {
+      // проверка на правильность структуры login и password
       const result = await authSchema.validateAsync(req.body);
+      // проверка на то, существует ли уже пользователь с данным email
       const doesExist = await User.findOne({ email: result.email });
       if (doesExist)
         throw createHttpError.Conflict(
           `${result.email} has already been registered`
         );
 
+      // создаем нового пользователя и сохраняем его, далее сайним ему access и refresh токены и отправляем их на клиент
       const user = new User(result);
       const savedUser = await user.save();
       const accessToken = await signAccessToken(savedUser.id);
@@ -33,7 +36,9 @@ module.exports = {
   },
   login: async (req, res, next) => {
     try {
+      // проверка на правильность структуры login и password
       const result = await authSchema.validateAsync(req.body);
+      // проверка на то, существует ли уже пользователь с данным email. Если нет, то происходит ошибка
       const user = await User.findOne({ email: result.email });
 
       if (!user) throw createHttpError.NotFound("User not registered");
@@ -54,7 +59,9 @@ module.exports = {
   },
   refreshToken: async (req, res, next) => {
     try {
+      // достаем refresh token из req.body
       const { refreshToken } = req.body;
+      // Если его нет, то создаем ошибку
       if (!refreshToken) throw createHttpError.BadRequest();
       // Verify refresh token in the request
       const userId = await verifyRefreshToken(refreshToken);

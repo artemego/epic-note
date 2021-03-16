@@ -1,5 +1,4 @@
 const Joi = require("@hapi/joi");
-const joi = require("@hapi/joi");
 
 // TODO: change the min length of password to 6-8
 // TODO: add a regex for password (lowercase, uppercase, numbers required)

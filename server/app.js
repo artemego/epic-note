@@ -2,6 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const createError = require("http-errors");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 require("dotenv").config();
 require("./helpers/init_mongodb");
 require("./helpers/init_redis");
@@ -10,6 +11,7 @@ const { verifyAccessToken } = require("./helpers/jwt_helper");
 const AuthRoute = require("./routes/Auth");
 
 const app = express();
+
 app.use(morgan("dev"));
 
 // подключаем cookie-parser middleware для работы с cookies
@@ -18,6 +20,8 @@ app.use(cookieParser());
 // handle json/form req body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// cors
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 app.get("/", verifyAccessToken, async (req, res, next) => {
   console.log(req.headers["authorization"]);

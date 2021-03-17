@@ -1,14 +1,17 @@
 const JWT = require("jsonwebtoken");
 const createError = require("http-errors");
 const client = require("./init_redis");
+const timespan = require("jsonwebtoken/lib/timespan");
 
 module.exports = {
   signAccessToken: (userId) => {
     return new Promise((resolve, reject) => {
       const payload = {};
       const secret = process.env.ACCESS_TOKEN_SECRET;
+      const expiresIn = timespan("15 min");
+      // console.log("Expiration time: " + expiresIn);
       const options = {
-        expiresIn: "15min",
+        expiresIn: expiresIn,
         issuer: "https://github.com/burani",
         audience: userId,
       };
@@ -18,7 +21,8 @@ module.exports = {
           console.log(err.message);
           reject(createError.InternalServerError());
         }
-        resolve(token);
+        // резолвится токен и время, когда истечет его срок действия
+        resolve({ accessToken: token, expiresIn });
       });
     });
   },
@@ -43,6 +47,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const payload = {};
       const secret = process.env.REFRESH_TOKEN_SECRET;
+      // Todo: заменить на меньшее время
       const options = {
         expiresIn: "1y",
         issuer: "https://github.com/burani",

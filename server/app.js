@@ -9,6 +9,7 @@ require("./helpers/init_redis");
 const { verifyAccessToken } = require("./helpers/jwt_helper");
 
 const AuthRoute = require("./routes/Auth");
+const NotesRoute = require("./routes/Notes");
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.get("/", verifyAccessToken, async (req, res, next) => {
 
 // ROUTES
 app.use("/auth", AuthRoute);
+app.use("/notes", NotesRoute);
 
 // path not found error
 app.use(async (req, res, next) => {

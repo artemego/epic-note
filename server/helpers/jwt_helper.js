@@ -26,6 +26,7 @@ module.exports = {
       });
     });
   },
+  // используется для проверки access токена в protected routes.
   verifyAccessToken: (req, res, next) => {
     if (!req.headers["authorization"]) return next(createError.Unauthorized());
     const authHeader = req.headers["authorization"];
@@ -60,6 +61,7 @@ module.exports = {
           reject(createError.InternalServerError());
         }
         // Сохраняем refreshToken в redis, устанавливаем ttl 1 год
+        // По идее мы перезаписываем токен пользователя
         client.SET(userId, token, "EX", 365 * 24 * 60 * 60, (err, reply) => {
           if (err) {
             console.log(err.message);
@@ -72,6 +74,7 @@ module.exports = {
     });
   },
   verifyRefreshToken: (refreshToken) => {
+    // здесь походу ошибка
     return new Promise((resolve, reject) => {
       JWT.verify(
         refreshToken,
@@ -82,11 +85,15 @@ module.exports = {
           const userId = payload.aud;
           // Ищем refreshToken в redis по userId
           client.GET(userId, (err, result) => {
+            // если не найден refreshToken
             if (err) {
               console.log(err.message);
               reject(createError.InternalServerError());
               return;
             }
+            console.log("Refresh token in database: " + result);
+            console.log("Refresh token in params: " + refreshToken);
+            console.log(refreshToken === result);
             // Проверяем, совпадает ли refreshToken от клиента с refreshToken в redis
             if (refreshToken === result) return resolve(userId);
             reject(createError.Unauthorized());

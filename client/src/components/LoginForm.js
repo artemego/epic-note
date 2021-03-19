@@ -1,8 +1,10 @@
-import { React, useState } from "react";
+import { React, useEffect, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useHistory } from "react-router-dom";
 import userSchema from "../schemas/userSchema";
+import { Link } from "react-router-dom";
 
 import {
   Stack,
@@ -15,21 +17,50 @@ import {
   FormHelperText,
   FormErrorMessage,
 } from "@chakra-ui/react";
+import { useAuth } from "../context/AuthContext";
+
+// Todo: скорее всего нужно объединить это с registerForm в один файл
 
 export default function LoginForm() {
-  const [showPassword, setShowPassword] = useState(false);
+  const history = useHistory();
 
+  const [showPassword, setShowPassword] = useState(false);
   const { register, handleSubmit, errors } = useForm({
     mode: "onBlur",
     resolver: yupResolver(userSchema),
   });
 
+  const { login, logout, refreshToken } = useAuth();
+
+  const { isAuth, error, isLoading } = useAuth().state;
+
   const handleLogin = (data) => {
     console.log(data);
+    login(data);
   };
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  const handleRefreshToken = () => {
+    refreshToken();
+  };
+
+  // console.log(isAuth, error, isLoading);
+
+  // console.log(error);
+
+  // useEffect(() => {
+  //   console.log("redirecting" + isAuth);
+  //   if (isAuth) history.push("/notes");
+  // }, [isAuth]);
 
   return (
     <>
+      <Link to="/auth/register">
+        <h1>To register</h1>
+      </Link>
       <form>
         <Stack maxWidth={1200} margin="auto" spacing={5} marginTop={5}>
           <FormControl
@@ -79,16 +110,25 @@ export default function LoginForm() {
               Your password
             </FormHelperText>
           </FormControl>
-          <Button
-            type="submit"
-            onClick={handleSubmit(handleLogin)}
-            colorScheme="green"
-            disabled={
-              !!errors.email || !!errors.password || errors.confirmPassword
-            }
-          >
-            Login
-          </Button>
+          <FormControl isInvalid={!!error?.message} errortext={error?.message}>
+            <Button
+              type="submit"
+              isLoading={isLoading}
+              onClick={handleSubmit(handleLogin)}
+              colorScheme="green"
+              disabled={
+                !!errors.email ||
+                !!errors.password ||
+                errors.confirmPassword ||
+                isLoading === true
+              }
+            >
+              Login
+            </Button>
+            <FormErrorMessage>{error?.message}</FormErrorMessage>
+          </FormControl>
+          <Button onClick={handleLogout}>Logout</Button>
+          <Button onClick={handleRefreshToken}>Refresh token</Button>
         </Stack>
       </form>
     </>

@@ -74,7 +74,6 @@ module.exports = {
     });
   },
   verifyRefreshToken: (refreshToken) => {
-    // здесь походу ошибка
     return new Promise((resolve, reject) => {
       JWT.verify(
         refreshToken,
@@ -91,8 +90,8 @@ module.exports = {
               reject(createError.InternalServerError());
               return;
             }
-            console.log("Refresh token in database: " + result);
-            console.log("Refresh token in params: " + refreshToken);
+            // console.log("Refresh token in database: " + result);
+            // console.log("Refresh token in params: " + refreshToken);
             console.log(refreshToken === result);
             // Проверяем, совпадает ли refreshToken от клиента с refreshToken в redis
             if (refreshToken === result) return resolve(userId);

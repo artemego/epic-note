@@ -22,7 +22,13 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // cors
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(
+  cors({
+    origin: "http://localhost:3006",
+    credentials: true,
+    methods: "GET, POST, DELETE",
+  })
+);
 
 app.get("/", verifyAccessToken, async (req, res, next) => {
   console.log(req.headers["authorization"]);

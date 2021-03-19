@@ -9,6 +9,13 @@ const {
 } = require("../helpers/jwt_helper");
 const client = require("../helpers/init_redis");
 
+const checkIfTokenExists = (obj) => {
+  if (obj && obj.refreshToken && Object.keys(obj.refreshToken).length) {
+    return true;
+  }
+  return false;
+};
+
 module.exports = {
   register: async (req, res, next) => {
     try {
@@ -41,11 +48,15 @@ module.exports = {
     }
   },
   login: async (req, res, next) => {
+    console.log(req.body);
+    // console.log(req);
     try {
       // проверка на правильность структуры login и password
       const result = await authSchema.validateAsync(req.body);
       // проверка на то, существует ли уже пользователь с данным email. Если нет, то происходит ошибка
       const user = await User.findOne({ email: result.email });
+      console.log(req.body);
+      console.log(result);
 
       if (!user) throw createHttpError.NotFound("User not registered");
 
@@ -72,9 +83,8 @@ module.exports = {
   // метод обновляет токены пользователя
   refreshToken: async (req, res, next) => {
     try {
-      // Todo: переписать на cookie
-      // достаем refresh token из req.cookies
-      // console.log("cookies: " + req.cookies.JWT.refreshToken);
+      if (!checkIfTokenExists(req.cookies.JWT))
+        throw createHttpError.BadRequest();
       const { refreshToken } = req.cookies.JWT;
       // Если его нет, то создаем ошибку
       if (!refreshToken) throw createHttpError.BadRequest();
@@ -97,16 +107,28 @@ module.exports = {
   },
   logout: async (req, res, next) => {
     try {
+      if (!checkIfTokenExists(req.cookies.JWT))
+        throw createHttpError.BadRequest();
       const { refreshToken } = req.cookies.JWT;
       if (!refreshToken) throw createHttpError.BadRequest();
       const userId = await verifyRefreshToken(refreshToken);
       client.DEL(userId, (err, val) => {
         if (err) {
-          console.log(err.message);
+          // console.log(err.message);
+          // Todo: здесь наверное тоже надо удалить куки у пользователя
           throw createHttpError.InternalServerError();
         }
-        console.log(val);
-        res.sendStatus(204);
+        // удаляем куки и отправляем ответ
+        res.cookie("JWT", "none", {
+          expires: new Date(Date.now() + 5 * 1000),
+          httpOnly: true,
+        });
+        res
+          .status(200)
+          .json({ success: true, message: "User logged out successfully" });
+
+        // console.log(val);
+        // res.sendStatus(204);
       });
     } catch (error) {
       next(error);

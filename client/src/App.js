@@ -1,33 +1,47 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button, ChakraProvider } from "@chakra-ui/react";
 import PrivateApp from "./PrivateApp";
 import PublicApp from "./PublicApp";
 import { useAuth } from "./context/AuthContext";
-// Todo: check cookie for auth
-// import BlockEditor from "./pages/blockEditor/BlockEditor";
+import { useComponentDidUpdate } from "./hooks/useComponentDidUpdate";
 
 function App() {
-  // Todo: здесь в componentDidMount надо попробовать залогиниться с кукой, если не получиться надо показать unauthorized app (в которой будет страница логина, ) isAuth надо получать из контекста
-
   const { refreshToken, logout } = useAuth();
+  const { isAuth, expiryDate } = useAuth().state;
+  const [timer, setTimer] = useState(null);
 
   // попытка логина с кукой refresh-token
   useEffect(() => {
-    console.log("In component didmount");
     refreshToken();
   }, []);
 
-  const { isAuth } = useAuth().state;
-  // get global state from context provider
+  // останавливаем/запускаем таймер, когда обновился expiryDate
+  useComponentDidUpdate(() => {
+    if (expiryDate) startRefreshTask();
+    else if (timer && !expiryDate) stopRefreshTask();
+  }, [expiryDate]);
 
-  // чтобы здесь использовать isAuth нам нужно App обернуть еще одной штукой, которая подключит провайдеры.
+  // функция для запуска таймера на обновление токенов
+  const startRefreshTask = () => {
+    const curTime = Date.now();
+    const timeToCheckRefresh = expiryDate * 1000 - curTime;
+    const timer = setTimeout(() => {
+      refreshToken();
+    }, timeToCheckRefresh);
+    setTimer(timer);
+  };
+
+  // функция для остановки таймера
+  const stopRefreshTask = () => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+  };
 
   const handleLogout = () => {
     console.log(isAuth);
     if (isAuth) logout();
   };
-
-  console.log("app rerender");
 
   return (
     <div>

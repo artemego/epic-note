@@ -1,4 +1,4 @@
-import { React, useEffect, createContext, useReducer, useContext } from "react";
+import { React, createContext, useReducer, useContext } from "react";
 import * as authApi from "../api/authApi";
 import * as ac from "./actions";
 
@@ -50,7 +50,6 @@ const reducer = (state, action) => {
 const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // Todo: здесь надо запускать таймер на refresh-token
   // здесь наверное как-то надо добавить useCallback
   const login = ({ email, password }) => {
     dispatch(ac.changeLoading(true));
@@ -91,6 +90,7 @@ const AuthProvider = ({ children }) => {
       });
   };
   // dispatch refresh token from api, put new accesstoken and exp in context.
+  // maybe make this async to return the response obj
   const refreshToken = () => {
     dispatch(ac.changeLoading(true));
     authApi

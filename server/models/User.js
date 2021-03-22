@@ -3,18 +3,28 @@ const Schema = mongoose.Schema;
 const argon2 = require("argon2");
 
 // Todo: добавить больше полей, expirationTime для refreshToken
-const UserSchema = new Schema({
-  email: {
-    type: String,
-    required: true,
-    lowercase: true,
-    unique: true,
+const UserSchema = new Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      lowercase: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    // страницы пользователя
+    pages: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "page",
+      },
+    ],
   },
-  password: {
-    type: String,
-    required: true,
-  },
-});
+  { timestamps: true }
+);
 
 // Метод срабатывает каждый раз перед тем как сохранить пользователя, он берет из объекта user незахерированный пароль и хэширует его.
 UserSchema.pre("save", async function (next) {

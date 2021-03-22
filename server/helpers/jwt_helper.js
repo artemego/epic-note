@@ -11,7 +11,7 @@ module.exports = {
       const expiresIn = timespan("15 min");
       // console.log("Expiration time: " + expiresIn);
       const options = {
-        expiresIn: expiresIn,
+        expiresIn: "15m",
         issuer: "https://github.com/burani",
         audience: userId,
       };
@@ -33,13 +33,18 @@ module.exports = {
     const bearerToken = authHeader.split(" ");
     const token = bearerToken[1];
 
+    console.log(token);
+
+    // payload == decoded token.
     JWT.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
       if (err) {
         // Чтобы не показывать, какая именно ошибка с токеном произошла
+        console.log("In error");
         const message =
           err.name === "JsonWebTokenError" ? "Unauthorized" : err.message;
         return next(createError.Unauthorized(message));
       }
+      // добавляем расшифрованный access_token на res, чтобы использовать данные в нем в дальнейшем.
       req.payload = payload;
       next();
     });

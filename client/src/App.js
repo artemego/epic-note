@@ -4,11 +4,13 @@ import PrivateApp from "./PrivateApp";
 import PublicApp from "./PublicApp";
 import { useAuth } from "./context/AuthContext";
 import { useComponentDidUpdate } from "./hooks/useComponentDidUpdate";
+// import { useHistory } from "react-router-dom";
 
 function App() {
   const { refreshToken, logout } = useAuth();
   const { isAuth, expiryDate } = useAuth().state;
   const [timer, setTimer] = useState(null);
+  // const history = useHistory();
 
   // попытка логина с кукой refresh-token
   useEffect(() => {
@@ -43,12 +45,18 @@ function App() {
     if (isAuth) logout();
   };
 
+  // redirect user to /login or /notes
+  // useEffect(() => {
+  //   if (isAuth) history.push("/notes");
+  //   else history.push("/login");
+  // }, [isAuth]);
+
   return (
     <div>
       <ChakraProvider>
         {/* <BlockEditor /> */}
         {/* <Router>{routes}</Router> */}
-        <Button onClick={handleLogout}>Logout</Button>
+        {/* <Button onClick={handleLogout}>Logout</Button> */}
         {isAuth ? <PrivateApp /> : <PublicApp />}
       </ChakraProvider>
     </div>

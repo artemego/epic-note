@@ -29,6 +29,8 @@ module.exports = {
       const userId = req.payload.aud;
       const pageId = req.params.pageId;
 
+      console.log("params: " + JSON.stringify(req.params));
+      console.log("page id" + pageId);
       const page = await Page.findById(pageId);
       if (!page) {
         throw createHttpError.NotFound("Cannot find page by id");

@@ -9,7 +9,13 @@ import RegisterPage from "../pages/register/RegisterPage";
 
 let publicRoutes = (
   <Switch>
-    <Route exact path="/" component={App} key="home" />,
+    <Route
+      exact
+      path="/"
+      render={() => <Redirect to={{ pathname: "/login" }} />}
+      key="home"
+    />
+    ,
     <Route path="/login" component={LoginPage} key="login" />,
     <Route path="/register" component={RegisterPage} key="register" />,
     <Route render={() => <Redirect to={{ pathname: "/" }} />} />

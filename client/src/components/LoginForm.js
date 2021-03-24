@@ -47,20 +47,13 @@ export default function LoginForm() {
     refreshToken();
   };
 
-  // console.log(isAuth, error, isLoading);
-
-  // console.log(error);
-
-  // useEffect(() => {
-  //   console.log("redirecting" + isAuth);
-  //   if (isAuth) history.push("/notes");
-  // }, [isAuth]);
+  useEffect(() => {
+    console.log("redirecting" + isAuth);
+    if (isAuth) history.push("/notes");
+  }, [isAuth]);
 
   return (
     <>
-      <Link to="/auth/register">
-        <h1>To register</h1>
-      </Link>
       <form>
         <Stack maxWidth={1200} margin="auto" spacing={5} marginTop={5}>
           <FormControl
@@ -128,7 +121,6 @@ export default function LoginForm() {
             <FormErrorMessage>{error?.message}</FormErrorMessage>
           </FormControl>
           <Button onClick={handleLogout}>Logout</Button>
-          <Button onClick={handleRefreshToken}>Refresh token</Button>
         </Stack>
       </form>
     </>

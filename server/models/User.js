@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const argon2 = require("argon2");
 
-// Todo: добавить больше полей, expirationTime для refreshToken
 const UserSchema = new Schema(
   {
     email: {
@@ -26,20 +25,20 @@ const UserSchema = new Schema(
   { timestamps: true }
 );
 
-// Метод срабатывает каждый раз перед тем как сохранить пользователя, он берет из объекта user незахерированный пароль и хэширует его.
-UserSchema.pre("save", async function (next) {
+// Метод вызываем каждый перед тем как сохранить пользователя при регистрации, он берет из объекта user незахешированный пароль и хэширует его.
+UserSchema.methods.hashPassword = async function () {
   try {
     const hashedPassword = await argon2.hash(this.password);
     this.password = hashedPassword;
-    next();
   } catch (error) {
-    next(error);
+    throw error;
   }
-});
+};
 
 // Метод проверяет на правильность пароля. Находим пользователя в базе данных, далее вызываем на объекте user этот метод. В этом методе в this будет содержаться реальный пользователь, и мы сможем сравнить введенный пароль с настоящим.
 UserSchema.methods.isValidPassword = async function (password) {
   try {
+    console.log(password);
     return await argon2.verify(this.password, password);
   } catch (error) {
     throw error;

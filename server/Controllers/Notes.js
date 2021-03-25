@@ -93,6 +93,7 @@ module.exports = {
         throw createHttpError.NotFound("Cannot find user by id");
       }
       user.pages.push(savedPage._id);
+      // Todo: да, здесь тупо перехэшируется пароль...
       await user.save();
 
       res.status(201).json({

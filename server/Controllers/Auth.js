@@ -30,6 +30,7 @@ module.exports = {
 
       // создаем нового пользователя и сохраняем его, далее сайним ему access и refresh токены и отправляем их на клиент
       const user = new User(result);
+      await user.hashPassword();
       const savedUser = await user.save();
       const { accessToken, expiresIn } = await signAccessToken(savedUser.id);
       const refreshToken = await signRefreshToken(savedUser.id);

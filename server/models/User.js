@@ -2,6 +2,21 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const argon2 = require("argon2");
 
+// Создаем subSchema, чтобы убрать _id из объектов pages
+const PageObj = new Schema(
+  {
+    pageId: {
+      type: Schema.Types.ObjectId,
+      ref: "page",
+    },
+    name: {
+      type: String,
+      required: false,
+    },
+  },
+  { _id: false }
+);
+
 const UserSchema = new Schema(
   {
     email: {
@@ -15,12 +30,7 @@ const UserSchema = new Schema(
       required: true,
     },
     // страницы пользователя
-    pages: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "page",
-      },
-    ],
+    pages: [PageObj],
   },
   { timestamps: true }
 );

@@ -4,9 +4,14 @@ const NotesController = require("../Controllers/Notes");
 
 const { verifyAccessToken } = require("../helpers/jwt_helper");
 
-router.get("/pages", verifyAccessToken, NotesController.getPages);
-router.get("/update-page", verifyAccessToken, NotesController.updatePage);
-router.get("/add-page", verifyAccessToken, NotesController.addPage);
-router.get("/page", verifyAccessToken, NotesController.getPage);
+// get pages
+router.get("/", verifyAccessToken, NotesController.getPages);
+
+// get single page with pageId
+router.get("/:pageId", verifyAccessToken, NotesController.getPage);
+
+router.put("/:pageId", verifyAccessToken, NotesController.updatePage);
+
+router.post("/", verifyAccessToken, NotesController.addPage);
 
 module.exports = router;

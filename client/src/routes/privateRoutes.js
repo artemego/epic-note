@@ -8,6 +8,7 @@ import Notes from "../pages/Notes";
 let privateRoutes = (
   <Switch>
     <Route exact path="/" component={Notes} key="home" />,
+    <Route path="/:pageId" component={Notes} key="home" />,
     <Route render={() => <Redirect to={{ pathname: "/" }} />} />
   </Switch>
 );

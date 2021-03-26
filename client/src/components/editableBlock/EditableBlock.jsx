@@ -15,6 +15,7 @@ class EditableBlock extends React.Component {
     this.openSelectMenuHandler = this.openSelectMenuHandler.bind(this);
     this.closeSelectMenuHandler = this.closeSelectMenuHandler.bind(this);
     this.tagSelectionHandler = this.tagSelectionHandler.bind(this);
+    this.handleFocus = this.handleFocus.bind(this);
     this.state = {
       htmlBackup: null,
       html: "",
@@ -25,22 +26,23 @@ class EditableBlock extends React.Component {
         x: null,
         y: null,
       },
+      isTyping: false,
     };
   }
 
   componentDidMount() {
-    console.log("did mount");
+    // console.log("did mount");
     this.setState({ html: this.props.html, tag: this.props.tag });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log("in cdu of block");
+    // console.log("in cdu of block");
     const htmlChanged = prevState.html !== this.state.html;
     const tagChanged = prevState.tag !== this.state.tag;
     if (htmlChanged || tagChanged) {
       // вот это короче вызывает метод, который мы передали из страницы, и он обновляет стейт самой страницы, то есть массив всех блоков.
       // console.log("PrevProps id: ")
-      console.log("updating page: ", this.state, this.props);
+      // console.log("updating page: ", this.state, this.props);
       this.props.updatePage({
         id: this.props.id,
         html: this.state.html,
@@ -50,8 +52,22 @@ class EditableBlock extends React.Component {
   }
 
   onChangeHandler(e) {
-    console.log("Regular on change");
+    // console.log("Regular on change");
     this.setState({ html: e.target.value });
+  }
+
+  handleFocus() {
+    // If a placeholder is set, we remove it when the block gets focused
+    if (this.state.placeholder) {
+      this.setState({
+        ...this.state,
+        html: "",
+        placeholder: false,
+        isTyping: true,
+      });
+    } else {
+      this.setState({ ...this.state, isTyping: true });
+    }
   }
 
   onKeyDownHandler(e) {
@@ -101,6 +117,14 @@ class EditableBlock extends React.Component {
     document.removeEventListener("click", this.closeSelectMenuHandler);
   }
 
+  handleMouseUp() {
+    const block = this.contentEditable.current;
+    const { selectionStart, selectionEnd } = getSelection(block);
+    if (selectionStart !== selectionEnd) {
+      this.openActionMenu(block, "TEXT_SELECTION");
+    }
+  }
+
   tagSelectionHandler(tag) {
     this.setState({ tag: tag, html: this.state.htmlBackup }, () => {
       setCaretToEnd(this.contentEditable.current);
@@ -109,7 +133,7 @@ class EditableBlock extends React.Component {
   }
 
   render() {
-    console.log("rerendering");
+    // console.log("rerendering");
     return (
       <>
         {this.state.selectMenuIsOpen && (
@@ -127,6 +151,8 @@ class EditableBlock extends React.Component {
           onChange={this.onChangeHandler}
           onKeyDown={this.onKeyDownHandler}
           onKeyUp={this.onKeyUpHandler}
+          data-position={this.props.position}
+          // onClick={this.props.setCurrent(this.props.id)}
         />
       </>
     );

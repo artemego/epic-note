@@ -4,6 +4,7 @@ import PrivateApp from "./PrivateApp";
 import PublicApp from "./PublicApp";
 import { useAuth } from "./context/AuthContext";
 import { useComponentDidUpdate } from "./hooks/useComponentDidUpdate";
+import { QueryClient, QueryClientProvider } from "react-query";
 // import { useHistory } from "react-router-dom";
 
 function App() {
@@ -11,6 +12,8 @@ function App() {
   const { isAuth, expiryDate } = useAuth().state;
   const [timer, setTimer] = useState(null);
   // const history = useHistory();
+
+  const queryClient = new QueryClient();
 
   // попытка логина с кукой refresh-token
   useEffect(() => {
@@ -53,12 +56,14 @@ function App() {
 
   return (
     <div>
-      <ChakraProvider>
-        {/* <BlockEditor /> */}
-        {/* <Router>{routes}</Router> */}
-        {/* <Button onClick={handleLogout}>Logout</Button> */}
-        {isAuth ? <PrivateApp /> : <PublicApp />}
-      </ChakraProvider>
+      <QueryClientProvider client={queryClient}>
+        <ChakraProvider>
+          {/* <BlockEditor /> */}
+          {/* <Router>{routes}</Router> */}
+          {/* <Button onClick={handleLogout}>Logout</Button> */}
+          {isAuth ? <PrivateApp /> : <PublicApp />}
+        </ChakraProvider>
+      </QueryClientProvider>
     </div>
   );
 }

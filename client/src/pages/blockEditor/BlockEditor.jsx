@@ -1,94 +1,120 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+// @ts-ignore
 import styles from "./blockEditor.module.css";
 import { generate } from "shortid";
 import EditableBlock from "../../components/editableBlock/EditableBlock";
 import { setCaretToEnd } from "../../helpers/setCaretToEnd";
+import usePrevious from "../../hooks/usePrevious";
 
-const blockInfo = [
-  {
-    id: generate(),
-    html: "",
-    tag: "h1",
-  },
-  {
-    id: generate(),
-    html: "",
-    tag: "h2",
-  },
-  {
-    id: generate(),
-    html: "",
-    tag: "p",
-  },
-];
+const BlockEditor = ({ fetchedBlocks }) => {
+  const [blocks, setBlocks] = useState(fetchedBlocks);
+  const [currentBlockId, setCurrentBlockId] = useState(null);
+  const prevBlocks = usePrevious(blocks);
 
-class BlockEditor extends React.Component {
-  constructor(props) {
-    super(props);
-    this.updatePageHandler = this.updatePageHandler.bind(this);
-    this.addBlockHandler = this.addBlockHandler.bind(this);
-    this.deleteBlockHandler = this.deleteBlockHandler.bind(this);
-    this.state = { blocks: [...blockInfo] };
-  }
+  useEffect(() => {
+    console.log("new fetched blocks");
+    setBlocks(fetchedBlocks);
+    setCurrentBlockId(null);
+  }, [fetchedBlocks]);
 
-  updatePageHandler(updatedBlock) {
-    console.log("update page handler");
-    const blocks = this.state.blocks;
-    const index = blocks.map((b) => b.id).indexOf(updatedBlock.id);
+  const updatePageOnServer = async (blocks) => {
+    // console.log(blocks);
+  };
+
+  useEffect(() => {
+    if (prevBlocks && prevBlocks !== blocks) {
+      updatePageOnServer(blocks);
+    }
+  }, [blocks, prevBlocks]);
+
+  // Handling the cursor and focus on adding and deleting blocks
+  useEffect(() => {
+    // If a new block was added, move the caret to it
+    if (prevBlocks && prevBlocks.length + 1 === blocks.length) {
+      const nextBlockPosition =
+        blocks.map((b) => b._id).indexOf(currentBlockId) + 1 + 1;
+      const nextBlock = document.querySelector(
+        `[data-position="${nextBlockPosition}"]`
+      );
+      if (nextBlock) {
+        nextBlock.focus();
+      }
+    }
+    // If a block was deleted, move the caret to the end of the last block
+    if (prevBlocks && prevBlocks.length - 1 === blocks.length) {
+      const lastBlockPosition = prevBlocks
+        .map((b) => b._id)
+        .indexOf(currentBlockId);
+      const lastBlock = document.querySelector(
+        `[data-position="${lastBlockPosition}"]`
+      );
+      if (lastBlock) {
+        setCaretToEnd(lastBlock);
+      }
+    }
+  }, [blocks, prevBlocks, currentBlockId]);
+
+  const updateBlockHandler = (currentBlock) => {
+    const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
+    const oldBlock = blocks[index];
     const updatedBlocks = [...blocks];
-    // сначала копируем свойства старого элемента, затем изменяем на новые
     updatedBlocks[index] = {
       ...updatedBlocks[index],
-      tag: updatedBlock.tag,
-      html: updatedBlock.html,
+      tag: currentBlock.tag,
+      html: currentBlock.html,
+      imageUrl: currentBlock.imageUrl,
     };
-    this.setState({ blocks: updatedBlocks });
-  }
+    setBlocks(updatedBlocks);
+  };
 
-  addBlockHandler(currentBlock) {
-    const newBlock = { id: generate(), html: "", tag: "p" };
-    const blocks = this.state.blocks;
-    const index = blocks.map((b) => b.id).indexOf(currentBlock.id);
+  const addBlockHandler = (currentBlock) => {
+    setCurrentBlockId(currentBlock.id);
+    const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
+    // console.log(index);
     const updatedBlocks = [...blocks];
+    const newBlock = { _id: generate(), tag: "p", html: "" };
     updatedBlocks.splice(index + 1, 0, newBlock);
-    this.setState({ blocks: updatedBlocks }, () => {
-      currentBlock.ref.nextElementSibling.focus();
-    });
-  }
+    // console.log("Updated blocks: " + updatedBlocks);
+    updatedBlocks[index] = {
+      ...updatedBlocks[index],
+      tag: currentBlock.tag,
+      html: currentBlock.html,
+      imageUrl: currentBlock.imageUrl,
+    };
+    setBlocks(updatedBlocks);
+  };
 
-  deleteBlockHandler(currentBlock) {
-    const previousBlock = currentBlock.ref.previousElementSibling;
-    if (previousBlock) {
-      const blocks = this.state.blocks;
-      const index = blocks.map((b) => b.id).indexOf(currentBlock.id);
+  const deleteBlockHandler = (currentBlock) => {
+    if (blocks.length > 1) {
+      setCurrentBlockId(currentBlock.id);
+      const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
+      const deletedBlock = blocks[index];
       const updatedBlocks = [...blocks];
       updatedBlocks.splice(index, 1);
-      this.setState({ blocks: updatedBlocks }, () => {
-        setCaretToEnd(previousBlock);
-        previousBlock.focus();
-      });
+      setBlocks(updatedBlocks);
     }
-  }
+  };
 
-  render() {
-    return (
-      <div className={styles.editor}>
-        {this.state.blocks.map((block) => {
-          return (
-            <EditableBlock
-              key={block.id}
-              id={block.id}
-              tag={block.tag}
-              html={block.html}
-              updatePage={this.updatePageHandler}
-              addBlock={this.addBlockHandler}
-              deleteBlock={this.deleteBlockHandler}
-            />
-          );
-        })}
-      </div>
-    );
-  }
-}
+  return (
+    <div className={styles.editor}>
+      {blocks.map((block) => {
+        const position = blocks.map((b) => b._id).indexOf(block._id) + 1;
+        return (
+          <EditableBlock
+            key={block._id}
+            position={position}
+            id={block._id}
+            tag={block.tag}
+            html={block.html}
+            // pageId={id}
+            addBlock={addBlockHandler}
+            deleteBlock={deleteBlockHandler}
+            updatePage={updateBlockHandler}
+          />
+        );
+      })}
+    </div>
+  );
+};
 
 export default BlockEditor;

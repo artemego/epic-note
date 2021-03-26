@@ -8,16 +8,40 @@ import {
   useDisclosure,
   VStack,
   Text,
+  Spinner,
 } from "@chakra-ui/react";
 import React from "react";
+import { useAuth } from "../context/AuthContext";
+import * as notesApi from "../api/notesApi";
+import { useQuery } from "react-query";
+import { useHistory } from "react-router";
 
-// данные наверное получаем из notes
-export default function SideBar({ pages }) {
-  // Todo: это скорее всего нужно перенести в компонент выше
+export default function SideBar() {
   const { isOpen, onToggle } = useDisclosure();
-  const btnRef = React.useRef();
+  const { logout } = useAuth();
+  const { accessToken } = useAuth().state;
+  const history = useHistory();
 
+  // react-query
+  const { data, error, isLoading, isError } = useQuery("pages", async () => {
+    return await notesApi.getPages(accessToken);
+  });
+
+  const btnRef = React.useRef();
   const position = isOpen ? "relative" : "fixed";
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  const handlePageClick = (pageId) => {
+    history.push(`/${pageId}`);
+  };
+
+  console.log("data: " + data);
+  if (!isLoading) {
+    console.log(data.pages);
+  }
 
   return (
     <>
@@ -46,7 +70,7 @@ export default function SideBar({ pages }) {
           w="300px"
           overflowY="scroll"
         >
-          <Box p={2.5} borderWidth="1px" m="5px" w="100%">
+          <Box p={2.5} mr="5px" ml="5px" w="100%">
             <Flex justifyContent="space-between">
               <Heading fontSize={28}>User Pages </Heading>
               {/* <IconButton
@@ -61,18 +85,35 @@ export default function SideBar({ pages }) {
               >
                 Close
               </Button>
+              <Button
+                aria-label="Close Control Panel"
+                onClick={handleLogout}
+                colorScheme="orange"
+              >
+                Logout
+              </Button>
             </Flex>
           </Box>
-          <Box
-            p={2}
-            borderWidth="1px"
-            m="5px"
-            w="100%"
-            _hover={{ bg: "#E8E6E1", cursor: "pointer" }}
-            style={{ transition: ".2s ease-in-out" }}
-          >
-            <Heading fontSize="xl">First page</Heading>
-          </Box>
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            data.pages.map((page) => (
+              <Box
+                onClick={() => {
+                  console.log(page.pageId);
+                  handlePageClick(page.pageId);
+                }}
+                p={2}
+                borderWidth="1px"
+                m="5px"
+                w="100%"
+                _hover={{ bg: "#E8E6E1", cursor: "pointer" }}
+                style={{ transition: ".2s ease-in-out" }}
+              >
+                <Heading fontSize="xl">{page.name}</Heading>
+              </Box>
+            ))
+          )}
         </VStack>
       </Slide>
     </>

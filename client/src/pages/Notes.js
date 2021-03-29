@@ -30,7 +30,11 @@ export default function Notes() {
   return (
     <div style={{ display: "flex" }}>
       <SideBar />
-      <BlockEditor fetchedBlocks={fetchedBlocks} />
+      <BlockEditor
+        fetchedBlocks={fetchedBlocks}
+        pageId={pageId}
+        accessToken={accessToken}
+      />
     </div>
   );
 }

@@ -5,25 +5,29 @@ import { generate } from "shortid";
 import EditableBlock from "../../components/editableBlock/EditableBlock";
 import { setCaretToEnd } from "../../helpers/setCaretToEnd";
 import usePrevious from "../../hooks/usePrevious";
+import * as notesApi from "../../api/notesApi";
+import objectId from "../../helpers/objectId";
 
-const BlockEditor = ({ fetchedBlocks }) => {
+const BlockEditor = ({ fetchedBlocks, pageId, accessToken }) => {
   const [blocks, setBlocks] = useState(fetchedBlocks);
   const [currentBlockId, setCurrentBlockId] = useState(null);
   const prevBlocks = usePrevious(blocks);
 
   useEffect(() => {
     console.log("new fetched blocks");
+    if (fetchedBlocks.length === 0) console.log("array length is 0");
     setBlocks(fetchedBlocks);
     setCurrentBlockId(null);
   }, [fetchedBlocks]);
 
   const updatePageOnServer = async (blocks) => {
-    // console.log(blocks);
+    console.log("UPDATING SERVER WITH BLOCKS: " + JSON.stringify(blocks));
+    notesApi.updatePage(accessToken, pageId, blocks);
   };
 
   useEffect(() => {
     if (prevBlocks && prevBlocks !== blocks) {
-      updatePageOnServer(blocks);
+      updatePageOnServer({ blocks: blocks });
     }
   }, [blocks, prevBlocks]);
 
@@ -54,7 +58,9 @@ const BlockEditor = ({ fetchedBlocks }) => {
     }
   }, [blocks, prevBlocks, currentBlockId]);
 
+  // Здесь мы обновляем общий стейт с блоками, а это в свою очередь триггерит useEffect на blocks и prevBlocks, в этом юз эффекте нам и нужно посылать запросы с обновлениями на сервер.
   const updateBlockHandler = (currentBlock) => {
+    console.log("In update block handler");
     const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
     const oldBlock = blocks[index];
     const updatedBlocks = [...blocks];
@@ -72,7 +78,7 @@ const BlockEditor = ({ fetchedBlocks }) => {
     const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
     // console.log(index);
     const updatedBlocks = [...blocks];
-    const newBlock = { _id: generate(), tag: "p", html: "" };
+    const newBlock = { _id: objectId(), tag: "p", html: "" };
     updatedBlocks.splice(index + 1, 0, newBlock);
     // console.log("Updated blocks: " + updatedBlocks);
     updatedBlocks[index] = {
@@ -106,7 +112,6 @@ const BlockEditor = ({ fetchedBlocks }) => {
             id={block._id}
             tag={block.tag}
             html={block.html}
-            // pageId={id}
             addBlock={addBlockHandler}
             deleteBlock={deleteBlockHandler}
             updatePage={updateBlockHandler}

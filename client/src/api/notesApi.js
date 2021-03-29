@@ -2,13 +2,7 @@ const NOTES_URL = "http://localhost:3000/notes";
 // const GET_PAGES = "pages";
 
 // клиент, который будет посылать наши запросы
-async function client(
-  endpoint,
-  paramString,
-  data = null,
-  method = "POST",
-  accessToken
-) {
+async function client(endpoint, data = null, method = "POST", accessToken) {
   if (!endpoint) endpoint = "";
   const authString = `Bearer ${accessToken}`;
   const stringData = data ? JSON.stringify(data) : null;
@@ -43,12 +37,19 @@ async function client(
 
 function getPages(accessToken) {
   console.log("getting pages");
-  return client(null, null, null, "GET", accessToken);
+  return client(null, null, "GET", accessToken);
 }
 
 function getPage(accessToken, pageId) {
   console.log("getting page");
-  return client(pageId, null, null, "GET", accessToken);
+  return client(pageId, null, "GET", accessToken);
 }
 
-export { getPages, getPage };
+function updatePage(accessToken, pageId, blocks) {
+  console.log("updating page on the server");
+  return client(pageId, blocks, "PUT", accessToken);
+}
+
+export { getPages, getPage, updatePage };
+
+// endpoint, (data = null), (method = "POST"), accessToken;

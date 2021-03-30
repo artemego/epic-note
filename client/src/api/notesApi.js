@@ -50,6 +50,15 @@ function updatePage(accessToken, pageId, blocks) {
   return client(pageId, blocks, "PUT", accessToken);
 }
 
-export { getPages, getPage, updatePage };
+function addPage(accessToken, pageName, blocks) {
+  console.log("updating page on the server");
+  const postData = {
+    name: pageName,
+    blocks,
+  };
+  return client(null, postData, "POST", accessToken);
+}
+
+export { getPages, getPage, updatePage, addPage };
 
 // endpoint, (data = null), (method = "POST"), accessToken;

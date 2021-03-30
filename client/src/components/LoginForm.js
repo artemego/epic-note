@@ -30,7 +30,7 @@ export default function LoginForm() {
     resolver: yupResolver(userSchema),
   });
 
-  const { login, logout, refreshToken } = useAuth();
+  const { login, logout } = useAuth();
 
   const { isAuth, error, isLoading } = useAuth().state;
 
@@ -41,10 +41,6 @@ export default function LoginForm() {
 
   const handleLogout = () => {
     logout();
-  };
-
-  const handleRefreshToken = () => {
-    refreshToken();
   };
 
   useEffect(() => {

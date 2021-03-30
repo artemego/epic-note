@@ -72,6 +72,7 @@ class EditableBlock extends React.Component {
   }
 
   handleFocus() {
+    console.log("in handle focus");
     // If a placeholder is set, we remove it when the block gets focused
     if (this.state.placeholder) {
       this.setState({
@@ -86,13 +87,15 @@ class EditableBlock extends React.Component {
   }
 
   handleBlur(e) {
+    console.log("in handle blur");
     // Показываем placeholder, если после blur все еще единственный и пустой.
     const hasPlaceholder = this.addPlaceholder({
       block: this.contentEditable.current,
       position: this.props.position,
       content: this.state.html || this.state.imageUrl,
     });
-    if (!hasPlaceholder) {
+    // не даем блюрить пользователю, если открыто меню выбора тэга, потому что изменится isTyping и при клике не заменится html на старый
+    if (!hasPlaceholder && !this.state.selectMenuIsOpen) {
       this.setState({ ...this.state, isTyping: false });
     }
   }
@@ -116,18 +119,21 @@ class EditableBlock extends React.Component {
     }
   }
 
+  // здесь надо проверить, не открыто ли меню
   onKeyDownHandler(e) {
     if (e.key === "/") {
       this.setState({ htmlBackup: this.state.html });
     }
-    if (e.key === "Enter") {
-      if (this.state.previousKey !== "Shift") {
-        e.preventDefault();
-        this.props.addBlock({
-          id: this.props.id,
-          ref: this.contentEditable.current,
-        });
-      }
+    if (
+      e.key === "Enter" &&
+      this.state.previousKey !== "Shift" &&
+      !this.state.selectMenuIsOpen
+    ) {
+      e.preventDefault();
+      this.props.addBlock({
+        id: this.props.id,
+        ref: this.contentEditable.current,
+      });
     }
     if (e.key === "Backspace" && !this.state.html) {
       e.preventDefault();
@@ -146,6 +152,7 @@ class EditableBlock extends React.Component {
   }
 
   openSelectMenuHandler() {
+    // Получаем координаты курсора в блоке
     const { x, y } = getCaretCoordinates();
     this.setState({
       selectMenuIsOpen: true,
@@ -172,6 +179,8 @@ class EditableBlock extends React.Component {
   }
 
   tagSelectionHandler(tag) {
+    console.log("in tag selectin handler");
+    console.log("is Typing: " + this.state.isTyping);
     if (this.state.isTyping) {
       this.setState({ tag: tag, html: this.state.htmlBackup }, () => {
         setCaretToEnd(this.contentEditable.current);

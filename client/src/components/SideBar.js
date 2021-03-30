@@ -9,23 +9,44 @@ import {
   VStack,
   Text,
   Spinner,
+  Icon,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import * as notesApi from "../api/notesApi";
 import { useQuery } from "react-query";
 import { useHistory } from "react-router";
+import {
+  AddIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ExternalLinkIcon,
+  HamburgerIcon,
+} from "@chakra-ui/icons";
+import AddPageModal from "./AddPageModal";
+import objectId from "../helpers/objectId";
 
 export default function SideBar() {
+  // Todo: можно здесь добавить error state
+  // Todo: можно заменить на mutation из react-query
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddingPage, setIsAddingPage] = useState(false);
   const { isOpen, onToggle } = useDisclosure();
   const { logout } = useAuth();
   const { accessToken } = useAuth().state;
   const history = useHistory();
 
   // react-query
-  const { data, error, isLoading, isError } = useQuery("pages", async () => {
-    return await notesApi.getPages(accessToken);
-  });
+  const { data, error, isLoading, isError, refetch } = useQuery(
+    "pages",
+    async () => {
+      return await notesApi.getPages(accessToken);
+    }
+  );
 
   const btnRef = React.useRef();
   const position = isOpen ? "relative" : "fixed";
@@ -43,13 +64,30 @@ export default function SideBar() {
     console.log(data.pages);
   }
 
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalSaveClick = async ({ pageTitle }) => {
+    // add page запрос на сервер
+    setIsAddingPage(true);
+    const initialBlock = { _id: objectId(), tag: "p", html: "" };
+    await notesApi.addPage(accessToken, pageTitle, initialBlock);
+    setIsAddingPage(false);
+    refetch();
+  };
+
   return (
     <>
       <div
         style={{ position: "absolute", left: "5px", top: "5px", zIndex: 100 }}
       >
         <Button ref={btnRef} colorScheme="orange" onClick={onToggle}>
-          Pages
+          Pages <ArrowRightIcon ml="10px" />
         </Button>
       </div>
       <Slide
@@ -70,7 +108,7 @@ export default function SideBar() {
           w="300px"
           overflowY="scroll"
         >
-          <Box p={2.5} mr="5px" ml="5px" w="100%">
+          <Box p={2.5} mr="5px" ml="5px" w="100%" position="relative">
             <Flex justifyContent="space-between">
               <Heading fontSize={28}>User Pages </Heading>
               {/* <IconButton
@@ -84,6 +122,7 @@ export default function SideBar() {
                 colorScheme="orange"
               >
                 Close
+                <ArrowLeftIcon ml="10px" />
               </Button>
               <Button
                 aria-label="Close Control Panel"
@@ -99,7 +138,9 @@ export default function SideBar() {
           ) : (
             data.pages.map((page) => (
               <Box
-                onClick={() => {
+                onClick={(e) => {
+                  // debugger;
+                  if (e.target.nodeName === "svg") return;
                   console.log(page.pageId);
                   handlePageClick(page.pageId);
                 }}
@@ -107,13 +148,69 @@ export default function SideBar() {
                 borderWidth="1px"
                 m="5px"
                 w="100%"
+                display="flex"
                 _hover={{ bg: "#E8E6E1", cursor: "pointer" }}
                 style={{ transition: ".2s ease-in-out" }}
+                justifyContent="space-between"
               >
                 <Heading fontSize="xl">{page.name}</Heading>
+                {/* <IconButton
+                  colorScheme="black"
+                  aria-label="Page options"
+                  variant="outline"
+                  icon={<DragHandleIcon />}
+                ></IconButton> */}
+                <Menu>
+                  <MenuButton
+                    as={IconButton}
+                    aria-label="Options"
+                    icon={<HamburgerIcon />}
+                    size="xs"
+                    variant="outline"
+                  />
+                  <MenuList>
+                    <MenuItem icon={<AddIcon />} command="⌘T">
+                      Delete page
+                    </MenuItem>
+                    <MenuItem icon={<ExternalLinkIcon />} command="⌘N">
+                      Duplicate
+                    </MenuItem>
+                    <MenuItem icon={<ExternalLinkIcon />} command="⌘N">
+                      Change name
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
               </Box>
             ))
           )}
+
+          <AddPageModal
+            isOpen={isModalOpen}
+            onClose={handleModalClose}
+            onSave={handleModalSaveClick}
+            isLoading={isAddingPage}
+          />
+
+          <Box
+            onClick={handleModalOpen}
+            p={2}
+            borderWidth="1px"
+            m="5px"
+            w="100%"
+            _hover={{ bg: "#E8E6E1", cursor: "pointer" }}
+            style={{ transition: ".2s ease-in-out" }}
+            position="fixed"
+            bottom="0px"
+            left="0px"
+            h="65px"
+            display="flex"
+            alignItems="center"
+          >
+            <AddIcon />
+            <Heading fontSize="xl" ml="15px">
+              New page
+            </Heading>
+          </Box>
         </VStack>
       </Slide>
     </>

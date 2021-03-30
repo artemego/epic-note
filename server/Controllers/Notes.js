@@ -139,13 +139,20 @@ module.exports = {
 
         // Обновляем коллекцию пользователей
         if (creatorId) {
+          debugger;
           const user = await User.findById(userId);
           if (!user) {
             const err = new Error("Could not find user by id.");
             err.statusCode = 404;
             throw err;
           }
-          user.pages.splice(user.pages.indexOf(deletedPage._id), 1);
+
+          const deleteIndex = user.pages.findIndex((p) => {
+            return JSON.stringify(p.pageId) === JSON.stringify(deletedPage._id);
+          });
+
+          user.pages.splice(deleteIndex, 1);
+
           await user.save();
         }
         res.status(200).json({

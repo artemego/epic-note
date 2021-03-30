@@ -90,7 +90,7 @@ export default function SideBar({ pageId }) {
     // delete page запрос на сервер
     setIsDeleting(true);
     setDeletingId(pageId);
-    console.log(pageId);
+    console.log("handlePageDelete, id: " + pageId);
     await notesApi.deletePage(accessToken, pageId);
     setIsDeleting(false);
     setDeletingId(null);
@@ -150,6 +150,7 @@ export default function SideBar({ pageId }) {
           ) : (
             data.pages.map((page) => (
               <Box
+                key={page.pageId}
                 onClick={(e) => {
                   // debugger;
                   if (e.target.nodeName === "svg") return;
@@ -164,12 +165,18 @@ export default function SideBar({ pageId }) {
                 _hover={{ bg: "#E8E6E1", cursor: "pointer" }}
                 style={{ transition: ".2s ease-in-out" }}
                 justifyContent="space-between"
-                key={page.pageId}
               >
                 {isDeleting && deletingId === page.pageId && (
                   <Spinner color="red.500" position="absolute" right="50%" />
                 )}
-                <Heading fontSize="xl">{page.name}</Heading>
+                <Heading
+                  fontSize="xl"
+                  color={pageId === page.pageId ? "orange.600" : ""}
+                  style={{ transition: ".2s ease-in-out" }}
+                  textDecor={pageId === page.pageId ? "underline" : ""}
+                >
+                  {page.name}
+                </Heading>
                 <Menu>
                   <MenuButton
                     as={IconButton}

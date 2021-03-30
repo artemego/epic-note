@@ -123,4 +123,39 @@ module.exports = {
   },
 
   // Todo: add delete page function.
+  deletePage: async (req, res, next) => {
+    try {
+      const userId = req.payload.aud;
+      const pageId = req.params.pageId;
+
+      const page = await Page.findById(pageId);
+      if (!page) {
+        throw createHttpError.NotFound("Cannot find page by id");
+      }
+
+      const creatorId = page.creator.toString();
+      if (creatorId && creatorId === userId) {
+        const deletedPage = await Page.findByIdAndDelete(pageId);
+
+        // Обновляем коллекцию пользователей
+        if (creatorId) {
+          const user = await User.findById(userId);
+          if (!user) {
+            const err = new Error("Could not find user by id.");
+            err.statusCode = 404;
+            throw err;
+          }
+          user.pages.splice(user.pages.indexOf(deletedPage._id), 1);
+          await user.save();
+        }
+        res.status(200).json({
+          message: "Deleted page successfully.",
+        });
+      } else {
+        throw createHttpError.Unauthorized("User is not authenticated");
+      }
+    } catch (err) {
+      next(err);
+    }
+  },
 };

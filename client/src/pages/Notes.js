@@ -29,7 +29,7 @@ export default function Notes() {
 
   return (
     <div style={{ display: "flex" }}>
-      <SideBar />
+      <SideBar pageId={pageId} />
       <BlockEditor
         fetchedBlocks={fetchedBlocks}
         pageId={pageId}

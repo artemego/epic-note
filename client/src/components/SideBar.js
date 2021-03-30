@@ -24,17 +24,21 @@ import {
   AddIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
-  ExternalLinkIcon,
+  CopyIcon,
+  DeleteIcon,
+  EditIcon,
   HamburgerIcon,
 } from "@chakra-ui/icons";
 import AddPageModal from "./AddPageModal";
 import objectId from "../helpers/objectId";
 
-export default function SideBar() {
+export default function SideBar({ pageId }) {
   // Todo: можно здесь добавить error state
   // Todo: можно заменить на mutation из react-query
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAddingPage, setIsAddingPage] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const { isOpen, onToggle } = useDisclosure();
   const { logout } = useAuth();
   const { accessToken } = useAuth().state;
@@ -74,10 +78,22 @@ export default function SideBar() {
 
   const handleModalSaveClick = async ({ pageTitle }) => {
     // add page запрос на сервер
-    setIsAddingPage(true);
+    setIsFetching(true);
     const initialBlock = { _id: objectId(), tag: "p", html: "" };
     await notesApi.addPage(accessToken, pageTitle, initialBlock);
-    setIsAddingPage(false);
+    setIsFetching(false);
+    setIsModalOpen(false);
+    refetch();
+  };
+
+  const handlePageDelete = async (pageId) => {
+    // delete page запрос на сервер
+    setIsDeleting(true);
+    setDeletingId(pageId);
+    console.log(pageId);
+    await notesApi.deletePage(accessToken, pageId);
+    setIsDeleting(false);
+    setDeletingId(null);
     refetch();
   };
 
@@ -111,25 +127,21 @@ export default function SideBar() {
           <Box p={2.5} mr="5px" ml="5px" w="100%" position="relative">
             <Flex justifyContent="space-between">
               <Heading fontSize={28}>User Pages </Heading>
-              {/* <IconButton
-                aria-label="Close Control Panel"
-                onClick={onToggle}
-                color="black"
-              /> */}
-              <Button
-                aria-label="Close Control Panel"
-                onClick={onToggle}
-                colorScheme="orange"
-              >
-                Close
-                <ArrowLeftIcon ml="10px" />
-              </Button>
               <Button
                 aria-label="Close Control Panel"
                 onClick={handleLogout}
                 colorScheme="orange"
               >
                 Logout
+              </Button>
+              <Button
+                aria-label="Close Control Panel"
+                onClick={onToggle}
+                colorScheme="orange"
+                ml="5px"
+              >
+                Close
+                <ArrowLeftIcon ml="10px" />
               </Button>
             </Flex>
           </Box>
@@ -152,14 +164,12 @@ export default function SideBar() {
                 _hover={{ bg: "#E8E6E1", cursor: "pointer" }}
                 style={{ transition: ".2s ease-in-out" }}
                 justifyContent="space-between"
+                key={page.pageId}
               >
+                {isDeleting && deletingId === page.pageId && (
+                  <Spinner color="red.500" position="absolute" right="50%" />
+                )}
                 <Heading fontSize="xl">{page.name}</Heading>
-                {/* <IconButton
-                  colorScheme="black"
-                  aria-label="Page options"
-                  variant="outline"
-                  icon={<DragHandleIcon />}
-                ></IconButton> */}
                 <Menu>
                   <MenuButton
                     as={IconButton}
@@ -169,13 +179,21 @@ export default function SideBar() {
                     variant="outline"
                   />
                   <MenuList>
-                    <MenuItem icon={<AddIcon />} command="⌘T">
+                    <MenuItem
+                      onClick={() => {
+                        // console.log("clicked");
+                        handlePageDelete(page.pageId);
+                      }}
+                      icon={<DeleteIcon />}
+                      command="⌘T"
+                      // onClick={handlePageDelete(page.id)}
+                    >
                       Delete page
                     </MenuItem>
-                    <MenuItem icon={<ExternalLinkIcon />} command="⌘N">
+                    <MenuItem icon={<CopyIcon />} command="⌘N">
                       Duplicate
                     </MenuItem>
-                    <MenuItem icon={<ExternalLinkIcon />} command="⌘N">
+                    <MenuItem icon={<EditIcon />} command="⌘N">
                       Change name
                     </MenuItem>
                   </MenuList>
@@ -188,7 +206,7 @@ export default function SideBar() {
             isOpen={isModalOpen}
             onClose={handleModalClose}
             onSave={handleModalSaveClick}
-            isLoading={isAddingPage}
+            isLoading={isFetching}
           />
 
           <Box

@@ -14,4 +14,6 @@ router.get("/:pageId", verifyAccessToken, NotesController.getPage);
 
 router.put("/:pageId", verifyAccessToken, NotesController.updatePage);
 
+router.delete("/:pageId", verifyAccessToken, NotesController.deletePage);
+
 module.exports = router;

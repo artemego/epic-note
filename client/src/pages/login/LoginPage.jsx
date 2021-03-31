@@ -7,7 +7,7 @@ import LoginForm from "../../components/LoginForm";
 const LoginPage = () => {
   return (
     <Box>
-      <Box textAlign="center">
+      <Box textAlign="center" mt="4rem">
         <Heading>Sing in to your account</Heading>
         <Text>
           Or <CustomLink to={"/register"}>Go to register page</CustomLink>

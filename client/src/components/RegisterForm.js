@@ -15,9 +15,12 @@ import {
   FormHelperText,
   FormErrorMessage,
 } from "@chakra-ui/react";
+import { useAuth } from "../context/AuthContext";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
+
+  const registerUser = useAuth().register;
 
   const { register, handleSubmit, errors } = useForm({
     mode: "onBlur",
@@ -26,6 +29,7 @@ export default function RegisterForm() {
 
   const handleRegister = (data) => {
     console.log(data);
+    registerUser(data);
   };
 
   return (
@@ -99,7 +103,7 @@ export default function RegisterForm() {
           <Button
             type="submit"
             onClick={handleSubmit(handleRegister)}
-            colorScheme="green"
+            colorScheme="orange"
             disabled={
               !!errors.email || !!errors.password || errors.confirmPassword
             }

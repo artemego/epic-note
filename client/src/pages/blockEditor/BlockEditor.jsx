@@ -74,6 +74,7 @@ const BlockEditor = ({ fetchedBlocks, pageId, accessToken }) => {
   };
 
   const addBlockHandler = (currentBlock) => {
+    console.log(currentBlock);
     setCurrentBlockId(currentBlock.id);
     const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
     // console.log(index);

@@ -63,10 +63,10 @@ export default function SideBar({ pageId }) {
     history.push(`/${pageId}`);
   };
 
-  console.log("data: " + data);
-  if (!isLoading) {
-    console.log(data.pages);
-  }
+  // console.log("data: " + data);
+  // if (!isLoading) {
+  //   console.log(data.pages);
+  // }
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -90,7 +90,7 @@ export default function SideBar({ pageId }) {
     // delete page запрос на сервер
     setIsDeleting(true);
     setDeletingId(pageId);
-    console.log("handlePageDelete, id: " + pageId);
+    // console.log("handlePageDelete, id: " + pageId);
     await notesApi.deletePage(accessToken, pageId);
     setIsDeleting(false);
     setDeletingId(null);
@@ -154,7 +154,7 @@ export default function SideBar({ pageId }) {
                 onClick={(e) => {
                   // debugger;
                   if (e.target.nodeName === "svg") return;
-                  console.log(page.pageId);
+                  // console.log(page.pageId);
                   handlePageClick(page.pageId);
                 }}
                 p={2}

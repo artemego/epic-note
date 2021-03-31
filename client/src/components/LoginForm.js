@@ -30,7 +30,7 @@ export default function LoginForm() {
     resolver: yupResolver(userSchema),
   });
 
-  const { login, logout } = useAuth();
+  const { login } = useAuth();
 
   const { isAuth, error, isLoading } = useAuth().state;
 
@@ -39,14 +39,10 @@ export default function LoginForm() {
     login(data);
   };
 
-  const handleLogout = () => {
-    logout();
-  };
-
-  useEffect(() => {
-    console.log("redirecting" + isAuth);
-    if (isAuth) history.push("/notes");
-  }, [isAuth]);
+  // useEffect(() => {
+  //   console.log("redirecting" + isAuth);
+  //   if (isAuth) history.push("/notes");
+  // }, [isAuth]);
 
   return (
     <>
@@ -65,7 +61,9 @@ export default function LoginForm() {
               ref={register}
             />
             <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
-            <FormHelperText id="email-helper-text">Your email</FormHelperText>
+            <FormHelperText id="email-helper-text">
+              Enter your email
+            </FormHelperText>
           </FormControl>
           <FormControl
             isInvalid={!!errors?.password?.message}
@@ -96,15 +94,22 @@ export default function LoginForm() {
             </InputGroup>
             <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
             <FormHelperText id="password-helper-text">
-              Your password
+              Enter your password
             </FormHelperText>
           </FormControl>
-          <FormControl isInvalid={!!error?.message} errortext={error?.message}>
+          <FormControl
+            isInvalid={!!error?.message}
+            errortext={error?.message}
+            display="flex"
+            alignItems="center"
+            flexDirection="column"
+          >
             <Button
               type="submit"
               isLoading={isLoading}
               onClick={handleSubmit(handleLogin)}
-              colorScheme="green"
+              colorScheme="orange"
+              w="100%"
               disabled={
                 !!errors.email ||
                 !!errors.password ||
@@ -116,7 +121,6 @@ export default function LoginForm() {
             </Button>
             <FormErrorMessage>{error?.message}</FormErrorMessage>
           </FormControl>
-          <Button onClick={handleLogout}>Logout</Button>
         </Stack>
       </form>
     </>

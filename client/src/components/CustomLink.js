@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export default function CustomLink({ to, children }) {
   return (
-    <ChakraLink>
+    <ChakraLink color="orange.500" fontWeight="700">
       <Link to={to}>{children}</Link>
     </ChakraLink>
   );

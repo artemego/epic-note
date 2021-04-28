@@ -1,10 +1,13 @@
+import { Box } from "@chakra-ui/layout";
 import React from "react";
 import ContentEditable from "react-contenteditable";
 import { getCaretCoordinates } from "../../helpers/getCaretCoordinates";
 import { setCaretToEnd } from "../../helpers/setCaretToEnd";
+import ButtonBlock from "../ButtonBlock";
 import SelectMenu from "../selectMenu/SelectMenu";
 import styles from "./editableBlock.module.css";
 
+const customTags = ["ul", "ol", "btn"];
 class EditableBlock extends React.Component {
   constructor(props) {
     super(props);
@@ -18,6 +21,7 @@ class EditableBlock extends React.Component {
     this.addPlaceholder = this.addPlaceholder.bind(this);
     this.handleFocus = this.handleFocus.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
+    this.handleCounterClick = this.handleCounterClick.bind(this);
     this.state = {
       htmlBackup: null,
       html: "",
@@ -30,6 +34,7 @@ class EditableBlock extends React.Component {
       },
       isTyping: false,
       placeholder: false,
+      counter: undefined,
     };
   }
 
@@ -42,7 +47,11 @@ class EditableBlock extends React.Component {
       content: this.props.html,
     });
     if (!hasPlaceholder) {
-      this.setState({ html: this.props.html, tag: this.props.tag });
+      this.setState({
+        html: this.props.html,
+        tag: this.props.tag,
+        counter: this.props.counter,
+      });
     }
   }
 
@@ -53,21 +62,26 @@ class EditableBlock extends React.Component {
     // берем html из пропсов, потому что нам надо сравнить html до начала печатания с html когда пользователь закончил печатать.
     const htmlChanged = this.props.html !== this.state.html;
     const tagChanged = prevState.tag !== this.state.tag;
+    const buttonChanged =
+      this.state.tag === "btn" && prevState.counter !== this.state.counter;
 
-    if (((stoppedTyping && htmlChanged) || tagChanged) && hasNoPlaceholder) {
+    // здесь нужно будет проверять состояние кастомных компонентов на изменения (сравнивать их с прошлыми).
+    if (
+      ((stoppedTyping && htmlChanged) || tagChanged || buttonChanged) &&
+      hasNoPlaceholder
+    ) {
       console.log("in update page");
       this.props.updatePage({
         id: this.props.id,
         html: this.state.html,
         tag: this.state.tag,
+        counter: this.state.counter,
       });
     }
   }
 
   onChangeHandler(e) {
-    // console.log("Regular on change");
     // Здесь сеттится новый html
-
     this.setState({ html: e.target.value });
   }
 
@@ -181,20 +195,35 @@ class EditableBlock extends React.Component {
   tagSelectionHandler(tag) {
     console.log("in tag selectin handler");
     console.log("is Typing: " + this.state.isTyping);
+    // is typing - когда мы выбираем с помощью /, остальное - мы выбираем с помощью клика (еще не имплементировано)
+    // после обновления тэга нужно обнулять counter, если не происходит выбор btn
+    const counterValue = tag === "btn" ? 0 : undefined;
     if (this.state.isTyping) {
-      this.setState({ tag: tag, html: this.state.htmlBackup }, () => {
-        setCaretToEnd(this.contentEditable.current);
-        this.closeSelectMenuHandler();
-      });
+      this.setState(
+        { tag: tag, html: this.state.htmlBackup, counter: counterValue },
+        () => {
+          setCaretToEnd(this.contentEditable.current);
+          this.closeSelectMenuHandler();
+        }
+      );
     } else {
-      this.setState({ ...this.state, tag: tag }, () => {
+      this.setState({ ...this.state, tag: tag, counter: counterValue }, () => {
         this.closeSelectMenuHandler();
       });
     }
   }
 
+  handleCounterClick() {
+    console.log("in handle counter");
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        counter: prevState.counter + 1,
+      };
+    });
+  }
+
   render() {
-    // console.log("rerendering");
     return (
       <>
         {this.state.selectMenuIsOpen && (
@@ -204,18 +233,39 @@ class EditableBlock extends React.Component {
             close={this.closeSelectMenuHandler}
           />
         )}
-        <ContentEditable
-          className={styles.Block}
-          innerRef={this.contentEditable}
-          html={this.state.html}
-          tagName={this.state.tag}
-          onChange={this.onChangeHandler}
-          onKeyDown={this.onKeyDownHandler}
-          onKeyUp={this.onKeyUpHandler}
-          data-position={this.props.position}
-          onBlur={this.handleBlur}
-          onFocus={this.handleFocus}
-        />
+        {this.state.tag === "btn" ? (
+          <div className={styles.ParentBlock}>
+            <ContentEditable
+              className={styles.Block}
+              innerRef={this.contentEditable}
+              html={this.state.html}
+              tagName={"p"}
+              onChange={this.onChangeHandler}
+              onKeyDown={this.onKeyDownHandler}
+              onKeyUp={this.onKeyUpHandler}
+              data-position={this.props.position}
+              onBlur={this.handleBlur}
+              onFocus={this.handleFocus}
+            />
+            <ButtonBlock
+              counter={this.state.counter}
+              onButtonClick={this.handleCounterClick}
+            />
+          </div>
+        ) : (
+          <ContentEditable
+            className={styles.Block}
+            innerRef={this.contentEditable}
+            html={this.state.html}
+            tagName={this.state.tag}
+            onChange={this.onChangeHandler}
+            onKeyDown={this.onKeyDownHandler}
+            onKeyUp={this.onKeyUpHandler}
+            data-position={this.props.position}
+            onBlur={this.handleBlur}
+            onFocus={this.handleFocus}
+          />
+        )}
       </>
     );
   }

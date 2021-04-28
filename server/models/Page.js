@@ -13,10 +13,10 @@ const PageSchema = new Schema(
           type: String,
           required: false,
         },
-        // imageUrl: {
-        //   type: String,
-        //   required: false
-        // }
+        counter: {
+          type: Number,
+          required: false,
+        },
       },
     ],
     // foreign key на object id - many to many

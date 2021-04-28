@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 // @ts-ignore
 import styles from "./blockEditor.module.css";
-import { generate } from "shortid";
 import EditableBlock from "../../components/editableBlock/EditableBlock";
 import { setCaretToEnd } from "../../helpers/setCaretToEnd";
 import usePrevious from "../../hooks/usePrevious";
 import * as notesApi from "../../api/notesApi";
 import objectId from "../../helpers/objectId";
 
-const BlockEditor = ({ fetchedBlocks, pageId, accessToken }) => {
+const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
   const [blocks, setBlocks] = useState(fetchedBlocks);
   const [currentBlockId, setCurrentBlockId] = useState(null);
   const prevBlocks = usePrevious(blocks);
@@ -18,6 +17,7 @@ const BlockEditor = ({ fetchedBlocks, pageId, accessToken }) => {
     if (fetchedBlocks.length === 0) console.log("array length is 0");
     setBlocks(fetchedBlocks);
     setCurrentBlockId(null);
+    console.log(fetchedBlocks);
   }, [fetchedBlocks]);
 
   const updatePageOnServer = async (blocks) => {
@@ -60,15 +60,16 @@ const BlockEditor = ({ fetchedBlocks, pageId, accessToken }) => {
 
   // Здесь мы обновляем общий стейт с блоками, а это в свою очередь триггерит useEffect на blocks и prevBlocks, в этом юз эффекте нам и нужно посылать запросы с обновлениями на сервер.
   const updateBlockHandler = (currentBlock) => {
-    console.log("In update block handler");
+    // console.log("In update block handler");
     const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
     const oldBlock = blocks[index];
     const updatedBlocks = [...blocks];
+
     updatedBlocks[index] = {
       ...updatedBlocks[index],
       tag: currentBlock.tag,
       html: currentBlock.html,
-      imageUrl: currentBlock.imageUrl,
+      counter: currentBlock.counter,
     };
     setBlocks(updatedBlocks);
   };
@@ -116,6 +117,7 @@ const BlockEditor = ({ fetchedBlocks, pageId, accessToken }) => {
             addBlock={addBlockHandler}
             deleteBlock={deleteBlockHandler}
             updatePage={updateBlockHandler}
+            counter={block.counter}
           />
         );
       })}

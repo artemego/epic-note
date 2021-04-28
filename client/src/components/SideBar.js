@@ -33,8 +33,6 @@ import AddPageModal from "./AddPageModal";
 import objectId from "../helpers/objectId";
 
 export default function SideBar({ pageId }) {
-  // Todo: можно здесь добавить error state
-  // Todo: можно заменить на mutation из react-query
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);

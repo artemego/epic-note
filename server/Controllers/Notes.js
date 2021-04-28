@@ -2,8 +2,6 @@ const createHttpError = require("http-errors");
 const User = require("../models/User");
 const Page = require("../models/Page");
 
-// Todo: может быть здесь стоит тоже проверять на существование пользователя (хотя уже была проверка в middleware)
-
 module.exports = {
   getPages: async (req, res, next) => {
     try {
@@ -80,7 +78,6 @@ module.exports = {
       next(err);
     }
   },
-  // Здесь нужно еще добавлять имя страницы
   addPage: async (req, res, next) => {
     try {
       const userId = req.payload.aud;
@@ -121,8 +118,6 @@ module.exports = {
       next(err);
     }
   },
-
-  // Todo: add delete page function.
   deletePage: async (req, res, next) => {
     try {
       const userId = req.payload.aud;

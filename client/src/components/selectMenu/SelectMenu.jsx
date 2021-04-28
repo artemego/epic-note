@@ -24,6 +24,11 @@ const allowedTags = [
     tag: "p",
     label: "Paragraph",
   },
+  {
+    id: "counter",
+    tag: "btn",
+    label: "Counter",
+  },
 ];
 
 class SelectMenu extends React.Component {

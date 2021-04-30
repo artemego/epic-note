@@ -22,6 +22,9 @@ class EditableBlock extends React.Component {
     this.handleFocus = this.handleFocus.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
     this.handleCounterClick = this.handleCounterClick.bind(this);
+    this.renderSwitch = this.renderSwitch.bind(this);
+    this.wrapHtmlLi = this.wrapHtmlLi.bind(this);
+    this.isListEmpty = this.isListEmpty.bind(this);
     this.state = {
       htmlBackup: null,
       html: "",
@@ -82,6 +85,7 @@ class EditableBlock extends React.Component {
 
   onChangeHandler(e) {
     // Здесь сеттится новый html
+    console.log("in on change");
     this.setState({ html: e.target.value });
   }
 
@@ -133,7 +137,6 @@ class EditableBlock extends React.Component {
     }
   }
 
-  // здесь надо проверить, не открыто ли меню
   onKeyDownHandler(e) {
     if (e.key === "/") {
       this.setState({ htmlBackup: this.state.html });
@@ -144,17 +147,29 @@ class EditableBlock extends React.Component {
       !this.state.selectMenuIsOpen
     ) {
       e.preventDefault();
-      this.props.addBlock({
-        id: this.props.id,
-        ref: this.contentEditable.current,
-      });
+      if (this.state.tag === "unordered") {
+        console.log("bulleted list");
+        this.setState((prevState) => {
+          return { html: prevState.html + "<li></li>" };
+        });
+      } else {
+        this.props.addBlock({
+          id: this.props.id,
+          ref: this.contentEditable.current,
+        });
+      }
     }
-    if (e.key === "Backspace" && !this.state.html) {
+    // удаляем если html empty или список пустой
+    if (e.key === "Backspace" && (!this.state.html || this.isListEmpty())) {
       e.preventDefault();
       this.props.deleteBlock({
         id: this.props.id,
         ref: this.contentEditable.current,
       });
+    }
+    // здесь нужно или удалить весь элемент или в случае того, что курсор на первом элементе, удалить первую строку li, добавить сверху новый элемент с этой строкой, если строка не пустая
+    if (e.key === "Backspace" && this.state.tag === "unordered") {
+      console.log(this.isListEmpty(this.state.html));
     }
     this.setState({ previousKey: e.key });
   }
@@ -197,19 +212,32 @@ class EditableBlock extends React.Component {
     console.log("is Typing: " + this.state.isTyping);
     // is typing - когда мы выбираем с помощью /, остальное - мы выбираем с помощью клика (еще не имплементировано)
     // после обновления тэга нужно обнулять counter, если не происходит выбор btn
+    // здесь нам нужно обернуть html в li, если мы переключаемся на li, в той функции как раз производится проверка на li, если они уже там есть, то ничего не произойдет. Просто чтобы на каждом рендере не вызывалось
     const counterValue = tag === "btn" ? 0 : undefined;
     if (this.state.isTyping) {
       this.setState(
-        { tag: tag, html: this.state.htmlBackup, counter: counterValue },
+        {
+          tag: tag,
+          html: this.wrapHtmlLi(this.state.htmlBackup, tag),
+          counter: counterValue,
+        },
         () => {
           setCaretToEnd(this.contentEditable.current);
           this.closeSelectMenuHandler();
         }
       );
     } else {
-      this.setState({ ...this.state, tag: tag, counter: counterValue }, () => {
-        this.closeSelectMenuHandler();
-      });
+      this.setState(
+        {
+          ...this.state,
+          tag: tag,
+          counter: counterValue,
+          html: this.wrapHtmlLi(this.state.html, tag),
+        },
+        () => {
+          this.closeSelectMenuHandler();
+        }
+      );
     }
   }
 
@@ -223,17 +251,24 @@ class EditableBlock extends React.Component {
     });
   }
 
-  render() {
-    return (
-      <>
-        {this.state.selectMenuIsOpen && (
-          <SelectMenu
-            position={this.state.selectMenuPosition}
-            onSelect={this.tagSelectionHandler}
-            close={this.closeSelectMenuHandler}
-          />
-        )}
-        {this.state.tag === "btn" ? (
+  wrapHtmlLi(html, tag) {
+    console.log("in wrap html");
+    if (tag !== "unordered") return html;
+    return html.includes("<li>") ? html : `<li>${html}</li>`;
+  }
+
+  isListEmpty() {
+    if (this.state.tag !== "unordered") return false;
+    // Если список, то проверяем html
+    console.log(this.state.html);
+    console.log(this.state.html === "<li><br></li>");
+    return this.state.html === "<li><br></li>";
+  }
+
+  renderSwitch(tag) {
+    switch (tag) {
+      case "btn":
+        return (
           <div className={styles.ParentBlock}>
             <ContentEditable
               className={styles.Block}
@@ -252,7 +287,24 @@ class EditableBlock extends React.Component {
               onButtonClick={this.handleCounterClick}
             />
           </div>
-        ) : (
+        );
+      case "unordered":
+        return (
+          <ContentEditable
+            className={styles.Block}
+            innerRef={this.contentEditable}
+            html={this.state.html}
+            tagName={"ul"}
+            onChange={this.onChangeHandler}
+            onKeyDown={this.onKeyDownHandler}
+            onKeyUp={this.onKeyUpHandler}
+            data-position={this.props.position}
+            onBlur={this.handleBlur}
+            onFocus={this.handleFocus}
+          />
+        );
+      default:
+        return (
           <ContentEditable
             className={styles.Block}
             innerRef={this.contentEditable}
@@ -265,7 +317,21 @@ class EditableBlock extends React.Component {
             onBlur={this.handleBlur}
             onFocus={this.handleFocus}
           />
+        );
+    }
+  }
+
+  render() {
+    return (
+      <>
+        {this.state.selectMenuIsOpen && (
+          <SelectMenu
+            position={this.state.selectMenuPosition}
+            onSelect={this.tagSelectionHandler}
+            close={this.closeSelectMenuHandler}
+          />
         )}
+        {this.renderSwitch(this.state.tag)}
       </>
     );
   }

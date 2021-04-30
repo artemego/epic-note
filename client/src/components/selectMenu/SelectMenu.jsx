@@ -29,6 +29,11 @@ const allowedTags = [
     tag: "btn",
     label: "Counter",
   },
+  {
+    id: "unordered",
+    tag: "unordered",
+    label: "Unordered list",
+  },
 ];
 
 class SelectMenu extends React.Component {
@@ -66,8 +71,10 @@ class SelectMenu extends React.Component {
 
     switch (e.key) {
       case "Enter":
+        // здесь на enter просто приходит любое введенное значение, даже не проверяется на верность тэга
         e.preventDefault();
-        this.props.onSelect(items[selected].tag);
+        if (!items[selected]?.tag) return;
+        this.props.onSelect(items[selected]?.tag);
         break;
       case "Backspace":
         if (!command) this.props.close();

@@ -86,6 +86,7 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
     setBlocks(updatedBlocks);
   };
 
+  // Вот здесь какая-то муть
   const addBlockHandler = (currentBlock) => {
     console.log(currentBlock);
     setCurrentBlockId(currentBlock.id);
@@ -99,7 +100,6 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
       ...updatedBlocks[index],
       tag: currentBlock.tag,
       html: currentBlock.html,
-      imageUrl: currentBlock.imageUrl,
     };
     setBlocks(updatedBlocks);
   };

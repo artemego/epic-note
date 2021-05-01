@@ -34,6 +34,11 @@ const allowedTags = [
     tag: "unordered",
     label: "Unordered list",
   },
+  {
+    id: "ordered",
+    tag: "ordered",
+    label: "ordered list",
+  },
 ];
 
 class SelectMenu extends React.Component {

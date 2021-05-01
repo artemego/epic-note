@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/layout";
 import React from "react";
 import ContentEditable from "react-contenteditable";
 import { getCaretCoordinates } from "../../helpers/getCaretCoordinates";
@@ -7,7 +6,7 @@ import ButtonBlock from "../ButtonBlock";
 import SelectMenu from "../selectMenu/SelectMenu";
 import styles from "./editableBlock.module.css";
 
-const customTags = ["ul", "ol", "btn"];
+const listTags = ["unordered", "ordered"];
 class EditableBlock extends React.Component {
   constructor(props) {
     super(props);
@@ -110,7 +109,7 @@ class EditableBlock extends React.Component {
     const hasPlaceholder = this.addPlaceholder({
       block: this.contentEditable.current,
       position: this.props.position,
-      content: this.state.html || this.state.imageUrl,
+      content: this.state.html,
     });
     // не даем блюрить пользователю, если открыто меню выбора тэга, потому что изменится isTyping и при клике не заменится html на старый
     if (!hasPlaceholder && !this.state.selectMenuIsOpen) {
@@ -144,10 +143,12 @@ class EditableBlock extends React.Component {
     if (
       e.key === "Enter" &&
       this.state.previousKey !== "Shift" &&
+      this.state.previousKey !== "Control" &&
       !this.state.selectMenuIsOpen
     ) {
+      console.log("Previous key " + this.state.previousKey);
       e.preventDefault();
-      if (this.state.tag === "unordered") {
+      if (listTags.includes(this.state.tag)) {
         console.log("bulleted list");
         this.setState((prevState) => {
           return { html: prevState.html + "<li></li>" };
@@ -159,6 +160,16 @@ class EditableBlock extends React.Component {
         });
       }
     }
+
+    // Это будет использоваться для выхода из списков.
+    if (e.key === "Enter" && this.state.previousKey === "Control") {
+      console.log("forced enter");
+      this.props.addBlock({
+        id: this.props.id,
+        ref: this.contentEditable.current,
+      });
+    }
+
     // удаляем если html empty или список пустой
     if (e.key === "Backspace" && (!this.state.html || this.isListEmpty())) {
       e.preventDefault();
@@ -167,9 +178,10 @@ class EditableBlock extends React.Component {
         ref: this.contentEditable.current,
       });
     }
-    // здесь нужно или удалить весь элемент или в случае того, что курсор на первом элементе, удалить первую строку li, добавить сверху новый элемент с этой строкой, если строка не пустая
-    if (e.key === "Backspace" && this.state.tag === "unordered") {
-      console.log(this.isListEmpty(this.state.html));
+    // Todo: удалить первую строку li, добавить сверху новый элемент с этой строкой, если строка не пустая
+    if (e.key === "Backspace" && listTags.includes(this.state.tag)) {
+      // const { x, y } = getCaretCoordinates();
+      // console.log(x, y);
     }
     this.setState({ previousKey: e.key });
   }
@@ -253,16 +265,20 @@ class EditableBlock extends React.Component {
 
   wrapHtmlLi(html, tag) {
     console.log("in wrap html");
-    if (tag !== "unordered") return html;
+    if (!listTags.includes(tag)) return html;
     return html.includes("<li>") ? html : `<li>${html}</li>`;
   }
 
   isListEmpty() {
-    if (this.state.tag !== "unordered") return false;
+    // проверка, является ли блок списковым
+    if (!listTags.includes(this.state.tag)) return false;
     // Если список, то проверяем html
     console.log(this.state.html);
-    console.log(this.state.html === "<li><br></li>");
-    return this.state.html === "<li><br></li>";
+    // console.log(this.state.html === "<li><br></li>");
+    const listEmpty =
+      this.state.html === "<li><br></li>" || this.state.html === "<li></li>";
+    console.log(listEmpty);
+    return listEmpty;
   }
 
   renderSwitch(tag) {
@@ -295,6 +311,21 @@ class EditableBlock extends React.Component {
             innerRef={this.contentEditable}
             html={this.state.html}
             tagName={"ul"}
+            onChange={this.onChangeHandler}
+            onKeyDown={this.onKeyDownHandler}
+            onKeyUp={this.onKeyUpHandler}
+            data-position={this.props.position}
+            onBlur={this.handleBlur}
+            onFocus={this.handleFocus}
+          />
+        );
+      case "ordered":
+        return (
+          <ContentEditable
+            className={styles.Block}
+            innerRef={this.contentEditable}
+            html={this.state.html}
+            tagName={"ol"}
             onChange={this.onChangeHandler}
             onKeyDown={this.onKeyDownHandler}
             onKeyUp={this.onKeyUpHandler}

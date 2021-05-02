@@ -51,7 +51,7 @@ export default function SideBar({ pageId }) {
   );
 
   const btnRef = React.useRef();
-  const position = isOpen ? "relative" : "fixed";
+  const position = isOpen ? "sticky" : "fixed";
 
   const handleLogout = () => {
     logout();
@@ -97,9 +97,7 @@ export default function SideBar({ pageId }) {
 
   return (
     <>
-      <div
-        style={{ position: "absolute", left: "5px", top: "5px", zIndex: 100 }}
-      >
+      <div style={{ position: "fixed", left: "5px", top: "5px", zIndex: 100 }}>
         <Button ref={btnRef} colorScheme="orange" onClick={onToggle}>
           Pages <ArrowRightIcon ml="10px" />
         </Button>

@@ -29,11 +29,11 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
     if (fetchedBlocks.length === 0) console.log("array length is 0");
     setBlocks(fetchedBlocks);
     setCurrentBlockId(null);
-    console.log(fetchedBlocks);
+    // console.log(fetchedBlocks);
   }, [fetchedBlocks]);
 
   const updatePageOnServer = async (blocks) => {
-    console.log("UPDATING SERVER WITH BLOCKS: " + JSON.stringify(blocks));
+    // console.log("UPDATING SERVER WITH BLOCKS: " + JSON.stringify(blocks));
     notesApi.updatePage(accessToken, pageId, blocks);
   };
 
@@ -88,7 +88,7 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
 
   // Вот здесь какая-то муть
   const addBlockHandler = (currentBlock) => {
-    console.log(currentBlock);
+    // console.log(currentBlock);
     setCurrentBlockId(currentBlock.id);
     const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
     // console.log(index);

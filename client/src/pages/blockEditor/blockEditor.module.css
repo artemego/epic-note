@@ -9,6 +9,10 @@
   margin: 1.5vh auto;
 }
 
+.droppable {
+  width: 100%;
+}
+
 /* Custom styles for blocks*/
 .editor h1 {
   font-size: 40px;

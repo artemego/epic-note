@@ -37,7 +37,7 @@ const allowedTags = [
   {
     id: "ordered",
     tag: "ordered",
-    label: "ordered list",
+    label: "Ordered list",
   },
 ];
 

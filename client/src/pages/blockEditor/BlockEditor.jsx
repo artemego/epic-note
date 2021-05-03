@@ -6,6 +6,7 @@ import { setCaretToEnd } from "../../helpers/setCaretToEnd";
 import usePrevious from "../../hooks/usePrevious";
 import * as notesApi from "../../api/notesApi";
 import objectId from "../../helpers/objectId";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 // let fetchedBlocks = [
 //   { _id: "6087ed090517ef6d77274b74", tag: "h1", html: "page titleаываыва" },
@@ -115,25 +116,55 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
     }
   };
 
+  const onDragEndHandler = (result) => {
+    const { destination, source } = result;
+
+    // If we don't have a destination (due to dropping outside the droppable)
+    // or the destination hasn't changed, we change nothing
+    if (!destination || destination.index === source.index) {
+      return;
+    }
+
+    const updatedBlocks = [...blocks];
+    const removedBlocks = updatedBlocks.splice(source.index - 1, 1);
+    updatedBlocks.splice(destination.index - 1, 0, removedBlocks[0]);
+    setBlocks(updatedBlocks);
+    console.log(destination, source);
+  };
+
   return (
-    <div className={styles.editor}>
-      {blocks.map((block) => {
-        const position = blocks.map((b) => b._id).indexOf(block._id) + 1;
-        return (
-          <EditableBlock
-            key={block._id}
-            position={position}
-            id={block._id}
-            tag={block.tag}
-            html={block.html}
-            addBlock={addBlockHandler}
-            deleteBlock={deleteBlockHandler}
-            updatePage={updateBlockHandler}
-            counter={block.counter}
-          />
-        );
-      })}
-    </div>
+    <DragDropContext onDragEnd={onDragEndHandler}>
+      <div className={styles.editor}>
+        <Droppable droppableId={pageId}>
+          {(provided) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className={styles.droppable}
+            >
+              {blocks.map((block) => {
+                const position =
+                  blocks.map((b) => b._id).indexOf(block._id) + 1;
+                return (
+                  <EditableBlock
+                    key={block._id}
+                    position={position}
+                    id={block._id}
+                    tag={block.tag}
+                    html={block.html}
+                    addBlock={addBlockHandler}
+                    deleteBlock={deleteBlockHandler}
+                    updatePage={updateBlockHandler}
+                    counter={block.counter}
+                  />
+                );
+              })}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </div>
+    </DragDropContext>
   );
 };
 

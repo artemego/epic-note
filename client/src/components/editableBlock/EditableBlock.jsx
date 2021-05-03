@@ -1,10 +1,13 @@
+import Icon from "@chakra-ui/icon";
+import { DragHandleIcon } from "@chakra-ui/icons";
 import React from "react";
+import { Draggable } from "react-beautiful-dnd";
 import ContentEditable from "react-contenteditable";
 import { getCaretCoordinates } from "../../helpers/getCaretCoordinates";
 import { setCaretToEnd } from "../../helpers/setCaretToEnd";
 import ButtonBlock from "../ButtonBlock";
 import SelectMenu from "../selectMenu/SelectMenu";
-import styles from "./editableBlock.module.css";
+import styles from "./editableBlock.module.scss";
 
 const listTags = ["unordered", "ordered"];
 class EditableBlock extends React.Component {
@@ -24,6 +27,7 @@ class EditableBlock extends React.Component {
     this.renderSwitch = this.renderSwitch.bind(this);
     this.wrapHtmlLi = this.wrapHtmlLi.bind(this);
     this.isListEmpty = this.isListEmpty.bind(this);
+    this.handleDragHandleClick = this.handleDragHandleClick.bind(this);
     this.state = {
       htmlBackup: null,
       html: "",
@@ -192,6 +196,12 @@ class EditableBlock extends React.Component {
     }
   }
 
+  handleDragHandleClick(e) {
+    const dragHandle = e.target;
+    // this.openActionMenu(dragHandle, "DRAG_HANDLE_CLICK");
+    // Todo: open action menu here
+  }
+
   openSelectMenuHandler() {
     // Получаем координаты курсора в блоке
     const { x, y } = getCaretCoordinates();
@@ -281,13 +291,20 @@ class EditableBlock extends React.Component {
     return listEmpty;
   }
 
-  renderSwitch(tag) {
+  renderSwitch(tag, isDragging) {
+    const blockClasses = [
+      styles.Block,
+      this.state.isTyping || this.state.selectMenuIsOpen
+        ? styles.BlockSelected
+        : null,
+      isDragging ? styles.isDragging : null,
+    ].join(" ");
     switch (tag) {
       case "btn":
         return (
           <div className={styles.ParentBlock}>
             <ContentEditable
-              className={styles.Block}
+              className={blockClasses}
               innerRef={this.contentEditable}
               html={this.state.html}
               tagName={"p"}
@@ -307,7 +324,7 @@ class EditableBlock extends React.Component {
       case "unordered":
         return (
           <ContentEditable
-            className={styles.Block}
+            className={blockClasses}
             innerRef={this.contentEditable}
             html={this.state.html}
             tagName={"ul"}
@@ -322,7 +339,7 @@ class EditableBlock extends React.Component {
       case "ordered":
         return (
           <ContentEditable
-            className={styles.Block}
+            className={blockClasses}
             innerRef={this.contentEditable}
             html={this.state.html}
             tagName={"ol"}
@@ -337,7 +354,7 @@ class EditableBlock extends React.Component {
       default:
         return (
           <ContentEditable
-            className={styles.Block}
+            className={blockClasses}
             innerRef={this.contentEditable}
             html={this.state.html}
             tagName={this.state.tag}
@@ -362,7 +379,24 @@ class EditableBlock extends React.Component {
             close={this.closeSelectMenuHandler}
           />
         )}
-        {this.renderSwitch(this.state.tag)}
+
+        <Draggable draggableId={this.props.id} index={this.props.position}>
+          {(provided, snapshot) => (
+            <div ref={provided.innerRef} {...provided.draggableProps}>
+              <div className={styles.draggable}>
+                {this.renderSwitch(this.state.tag, snapshot.isDragging)}
+                <span
+                  role="button"
+                  className={styles.dragHandle}
+                  onClick={this.handleDragHandleClick}
+                  {...provided.dragHandleProps}
+                >
+                  <Icon as={DragHandleIcon} />
+                </span>
+              </div>
+            </div>
+          )}
+        </Draggable>
       </>
     );
   }

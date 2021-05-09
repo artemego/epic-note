@@ -50,6 +50,11 @@ function updatePage(accessToken, pageId, blocks) {
   return client(pageId, blocks, "PUT", accessToken);
 }
 
+function updatePages(accessToken, newTree) {
+  console.log("updating pages on the server with", newTree);
+  return client(null, newTree, "PUT", accessToken);
+}
+
 function addPage(accessToken, pageName, blocks) {
   console.log("adding page on the server");
   const postData = {
@@ -64,6 +69,6 @@ function deletePage(accessToken, pageId) {
   return client(pageId, null, "DELETE", accessToken);
 }
 
-export { getPages, getPage, updatePage, addPage, deletePage };
+export { getPages, getPage, updatePage, addPage, deletePage, updatePages };
 
 // endpoint, (data = null), (method = "POST"), accessToken;

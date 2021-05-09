@@ -9,6 +9,9 @@ router.get("/", verifyAccessToken, NotesController.getPages);
 
 router.post("/", verifyAccessToken, NotesController.addPage);
 
+// update pages
+router.put("/", verifyAccessToken, NotesController.updatePages);
+
 // get single page with pageId
 router.get("/:pageId", verifyAccessToken, NotesController.getPage);
 

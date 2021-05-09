@@ -20,17 +20,10 @@ import { useAuth } from "../context/AuthContext";
 import * as notesApi from "../api/notesApi";
 import { useQuery } from "react-query";
 import { useHistory } from "react-router";
-import {
-  AddIcon,
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  CopyIcon,
-  DeleteIcon,
-  EditIcon,
-  HamburgerIcon,
-} from "@chakra-ui/icons";
+import { AddIcon, ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
 import AddPageModal from "./AddPageModal";
 import objectId from "../helpers/objectId";
+import FolderTree from "./FolderTree";
 
 export default function SideBar({ pageId }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,7 +54,7 @@ export default function SideBar({ pageId }) {
     history.push(`/${pageId}`);
   };
 
-  // console.log("data: " + data);
+  // console.log("data: " + JSON.stringify(data));
   // if (!isLoading) {
   //   console.log(data.pages);
   // }
@@ -76,6 +69,7 @@ export default function SideBar({ pageId }) {
 
   const handleModalSaveClick = async ({ pageTitle }) => {
     // add page запрос на сервер
+    console.log("in handle add page");
     setIsFetching(true);
     const initialBlock = { _id: objectId(), tag: "p", html: "" };
     await notesApi.addPage(accessToken, pageTitle, initialBlock);
@@ -93,12 +87,19 @@ export default function SideBar({ pageId }) {
     setIsDeleting(false);
     setDeletingId(null);
     refetch();
+    console.log("in delete page");
+  };
+
+  // здесь мы просто наверное будем отсылать запрос на обновление страниц, на клиенте обновление уже произойдет в дереве, хотя хз
+  const handleUpdatePages = async (newTree) => {
+    console.log("in update pages");
+    notesApi.updatePages(accessToken, newTree);
   };
 
   return (
     <>
       <div style={{ position: "fixed", left: "5px", top: "5px", zIndex: 100 }}>
-        <Button ref={btnRef} colorScheme="orange" onClick={onToggle}>
+        <Button ref={btnRef} chcolorSeme="orange" onClick={onToggle}>
           Pages <ArrowRightIcon ml="10px" />
         </Button>
       </div>
@@ -144,65 +145,15 @@ export default function SideBar({ pageId }) {
           {isLoading ? (
             <Spinner />
           ) : (
-            data.pages.map((page) => (
-              <Box
-                key={page.pageId}
-                onClick={(e) => {
-                  // debugger;
-                  if (e.target.nodeName === "svg") return;
-                  // console.log(page.pageId);
-                  handlePageClick(page.pageId);
-                }}
-                p={2}
-                borderWidth="1px"
-                m="5px"
-                w="100%"
-                display="flex"
-                _hover={{ bg: "#E8E6E1", cursor: "pointer" }}
-                style={{ transition: ".2s ease-in-out" }}
-                justifyContent="space-between"
-              >
-                {isDeleting && deletingId === page.pageId && (
-                  <Spinner color="red.500" position="absolute" right="50%" />
-                )}
-                <Heading
-                  fontSize="xl"
-                  color={pageId === page.pageId ? "orange.600" : ""}
-                  style={{ transition: ".2s ease-in-out" }}
-                  textDecor={pageId === page.pageId ? "underline" : ""}
-                >
-                  {page.name}
-                </Heading>
-                <Menu>
-                  <MenuButton
-                    as={IconButton}
-                    aria-label="Options"
-                    icon={<HamburgerIcon />}
-                    size="xs"
-                    variant="outline"
-                  />
-                  <MenuList>
-                    <MenuItem
-                      onClick={() => {
-                        // console.log("clicked");
-                        handlePageDelete(page.pageId);
-                      }}
-                      icon={<DeleteIcon />}
-                      command="⌘T"
-                      // onClick={handlePageDelete(page.id)}
-                    >
-                      Delete page
-                    </MenuItem>
-                    <MenuItem icon={<CopyIcon />} command="⌘N">
-                      Duplicate
-                    </MenuItem>
-                    <MenuItem icon={<EditIcon />} command="⌘N">
-                      Change name
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-              </Box>
-            ))
+            <FolderTree
+              handlePageClick={handlePageClick}
+              handlePageDelete={handlePageDelete}
+              pageId={pageId}
+              isDeleting={isDeleting}
+              deletingId={deletingId}
+              handleUpdatePages={handleUpdatePages}
+              pagesData={data.pages}
+            />
           )}
 
           <AddPageModal

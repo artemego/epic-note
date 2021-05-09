@@ -78,6 +78,32 @@ module.exports = {
       next(err);
     }
   },
+  // это мы вызываем, когда изменяется порядок страниц в дереве.
+  updatePages: async (req, res, next) => {
+    // Todo: сюда приходит объект дерева от клиента, из него достаем items
+    try {
+      const { items } = req.body;
+      const userId = req.payload.aud;
+      const user = await User.findById(userId);
+
+      if (!user) {
+        throw createHttpError.NotFound("Cannot find user by id");
+      }
+
+      user.pages.rootIds = items["1"].children;
+      const pageItems = Object.values(items);
+      // удаляем root элемент
+      pageItems.shift();
+      user.pages.pageItems = pageItems;
+      user.save();
+      res.status(200).json({
+        message: "Updated page successfully.",
+        pages: user.pages.pageItems,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
   addPage: async (req, res, next) => {
     try {
       const userId = req.payload.aud;
@@ -102,8 +128,19 @@ module.exports = {
       if (!user) {
         throw createHttpError.NotFound("Cannot find user by id");
       }
-      // Добавляем вместе с page_id page name
-      user.pages.push({ pageId: savedPage._id, name: pageName });
+
+      user.pages.pageItems.push({
+        id: savedPage._id.toString(),
+        children: [],
+        hasChildren: false,
+        isExpanded: false,
+        isChildrenLoading: false,
+        data: {
+          title: pageName,
+        },
+      });
+      // добавляем id страницы в массив children у root
+      user.pages.rootIds.push(savedPage._id.toString());
 
       await user.save();
 
@@ -122,7 +159,6 @@ module.exports = {
     try {
       const userId = req.payload.aud;
       const pageId = req.params.pageId;
-
       const page = await Page.findById(pageId);
       if (!page) {
         throw createHttpError.NotFound("Cannot find page by id");
@@ -131,7 +167,6 @@ module.exports = {
       const creatorId = page.creator.toString();
       if (creatorId && creatorId === userId) {
         const deletedPage = await Page.findByIdAndDelete(pageId);
-
         // Обновляем коллекцию пользователей
         if (creatorId) {
           debugger;
@@ -141,13 +176,37 @@ module.exports = {
             err.statusCode = 404;
             throw err;
           }
-
-          const deleteIndex = user.pages.findIndex((p) => {
-            return JSON.stringify(p.pageId) === JSON.stringify(deletedPage._id);
+          const deletedPageId = JSON.stringify(deletedPage._id);
+          const deleteIndex = user.pages.pageItems.findIndex((p) => {
+            return JSON.stringify(p.id) === deletedPageId;
           });
+          user.pages.pageItems.splice(deleteIndex, 1);
 
-          user.pages.splice(deleteIndex, 1);
+          user.pages.pageItems.forEach((p) => {
+            if (p.hasChildren) {
+              const index = p.children.findIndex((child) => {
+                return JSON.stringify(child) === deletedPageId;
+              });
 
+              console.log(index);
+              if (index !== -1) {
+                console.log("splicing");
+                p.children.splice(index, 1);
+              }
+              // console.log("after deleting children " + p.children);
+            }
+          });
+          // console.log("pages after deletion: " + user.pages.pageItems);
+
+          // console.log("previous root ids: " + user.pages.rootIds);
+          const newRootIds = user.pages.rootIds.filter((id) => {
+            console.log(id, deletedPageId);
+            console.log(typeof JSON.stringify(id), typeof deletedPageId);
+            console.log(JSON.stringify(id) === deletedPageId);
+            return JSON.stringify(id) !== deletedPageId;
+          });
+          console.log(newRootIds);
+          user.pages.rootIds = newRootIds;
           await user.save();
         }
         res.status(200).json({

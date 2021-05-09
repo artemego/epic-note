@@ -8,18 +8,6 @@ import * as notesApi from "../../api/notesApi";
 import objectId from "../../helpers/objectId";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
-// let fetchedBlocks = [
-//   { _id: "6087ed090517ef6d77274b74", tag: "h1", html: "page titleаываыва" },
-//   { _id: "6087ed168de4d5b90415f8de", tag: "p", html: "new page content" },
-//   { _id: "60882c33ee7a6ee4afa4dfff", tag: "p", html: "qweqe" },
-//   { _id: "6089a8b24cf813dc609ad6d0", tag: "p", html: "qweqewq" },
-//   {
-//     _id: "6089a8f4d40ee50267ccab1e",
-//     tag: "unordered",
-//     html: "hello",
-//   },
-// ];
-
 const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
   const [blocks, setBlocks] = useState(fetchedBlocks);
   const [currentBlockId, setCurrentBlockId] = useState(null);

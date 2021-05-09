@@ -1,17 +1,36 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const argon2 = require("argon2");
+const { bool } = require("@hapi/joi");
 
 // Создаем subSchema, чтобы убрать _id из объектов pages
+// Здесь теперь будут храниться страницы в структуре дерева из atlaskit
 const PageObj = new Schema(
   {
-    pageId: {
+    id: {
       type: Schema.Types.ObjectId,
+      required: true,
       ref: "page",
     },
-    name: {
-      type: String,
-      required: false,
+    children: [Schema.Types.ObjectId],
+    hasChildren: {
+      type: Boolean,
+      default: false,
+    },
+    isExpanded: {
+      type: Boolean,
+      default: false,
+    },
+    isChildrenLoading: {
+      type: Boolean,
+      default: false,
+    },
+    data: {
+      title: {
+        type: String,
+        required: true,
+        default: false,
+      },
     },
   },
   { _id: false }
@@ -29,8 +48,11 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
-    // страницы пользователя
-    pages: [PageObj],
+    // страницы пользователя и корневые страницы дерева
+    pages: {
+      pageItems: [PageObj],
+      rootIds: [Schema.Types.ObjectId],
+    },
   },
   { timestamps: true }
 );

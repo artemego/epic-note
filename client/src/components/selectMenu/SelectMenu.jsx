@@ -53,6 +53,7 @@ class SelectMenu extends React.Component {
   }
 
   componentDidMount() {
+    console.log("mounted select menu");
     document.addEventListener("keydown", this.keyDownHandler);
   }
 
@@ -107,6 +108,8 @@ class SelectMenu extends React.Component {
     const x = this.props.position.x;
     const y = this.props.position.y - MENU_HEIGHT;
     const positionAttributes = { top: y, left: x };
+
+    console.log(positionAttributes);
 
     return (
       <div className={styles.selectMenu} style={positionAttributes}>

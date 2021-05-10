@@ -1,13 +1,13 @@
-import Icon from "@chakra-ui/icon";
-import { DragHandleIcon } from "@chakra-ui/icons";
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
 import ContentEditable from "react-contenteditable";
 import { getCaretCoordinates } from "../../helpers/getCaretCoordinates";
 import { setCaretToEnd } from "../../helpers/setCaretToEnd";
+import ActionMenu from "../actionMenu/ActionMenu";
 import ButtonBlock from "../ButtonBlock";
 import SelectMenu from "../selectMenu/SelectMenu";
 import styles from "./editableBlock.module.scss";
+import DragHandleIcon from "../../images/draggable.svg";
 
 const listTags = ["unordered", "ordered"];
 class EditableBlock extends React.Component {
@@ -19,6 +19,8 @@ class EditableBlock extends React.Component {
     this.onKeyUpHandler = this.onKeyUpHandler.bind(this);
     this.openSelectMenuHandler = this.openSelectMenuHandler.bind(this);
     this.closeSelectMenuHandler = this.closeSelectMenuHandler.bind(this);
+    this.openActionMenuHanler = this.openActionMenuHanler.bind(this);
+    this.closeActionMenuHandler = this.closeActionMenuHandler.bind(this);
     this.tagSelectionHandler = this.tagSelectionHandler.bind(this);
     this.addPlaceholder = this.addPlaceholder.bind(this);
     this.handleFocus = this.handleFocus.bind(this);
@@ -35,6 +37,11 @@ class EditableBlock extends React.Component {
       previousKey: "",
       selectMenuIsOpen: false,
       selectMenuPosition: {
+        x: null,
+        y: null,
+      },
+      actionMenuIsOpen: false,
+      actionMenuPosition: {
         x: null,
         y: null,
       },
@@ -192,40 +199,89 @@ class EditableBlock extends React.Component {
 
   onKeyUpHandler(e) {
     if (e.key === "/") {
-      this.openSelectMenuHandler();
+      this.openSelectMenuHandler("KEY_CMD");
     }
   }
 
   handleDragHandleClick(e) {
+    console.log("in handle drag click");
     const dragHandle = e.target;
-    // this.openActionMenu(dragHandle, "DRAG_HANDLE_CLICK");
-    // Todo: open action menu here
+    this.openActionMenuHanler(dragHandle, "DRAG_HANDLE_CLICK");
   }
 
-  openSelectMenuHandler() {
-    // Получаем координаты курсора в блоке
-    const { x, y } = getCaretCoordinates();
+  openSelectMenuHandler(trigger) {
+    const { x, y } = this.calculateSelectMenuPosition(trigger);
+    console.log(x, y);
     this.setState({
+      ...this.state,
+      selectMenuPosition: { x: x, y: y },
       selectMenuIsOpen: true,
-      selectMenuPosition: { x, y },
     });
-    document.addEventListener("click", this.closeSelectMenuHandler);
+    // document.addEventListener("click", this.closeSelectMenuHandler, false);
+    setTimeout(() => {
+      document.addEventListener("click", this.closeSelectMenuHandler, false);
+    }, 100);
   }
 
   closeSelectMenuHandler() {
+    console.log("closing select menu");
     this.setState({
       htmlBackup: null,
       selectMenuIsOpen: false,
       selectMenuPosition: { x: null, y: null },
     });
-    document.removeEventListener("click", this.closeSelectMenuHandler);
+    document.removeEventListener("click", this.closeSelectMenuHandler, false);
   }
 
-  handleMouseUp() {
-    const block = this.contentEditable.current;
-    const { selectionStart, selectionEnd } = getSelection(block);
-    if (selectionStart !== selectionEnd) {
-      this.openActionMenu(block, "TEXT_SELECTION");
+  openActionMenuHanler(parent, trigger) {
+    const { x, y } = this.calculateActionMenuPosition(parent, trigger);
+    console.log(x, y);
+
+    this.setState({
+      ...this.state,
+      actionMenuPosition: { x: x, y: y },
+      actionMenuIsOpen: true,
+    });
+
+    setTimeout(() => {
+      document.addEventListener("click", this.closeActionMenuHandler, false);
+    }, 100);
+  }
+
+  closeActionMenuHandler() {
+    this.setState({
+      ...this.state,
+      actionMenuPosition: { x: null, y: null },
+      actionMenuIsOpen: false,
+    });
+    document.removeEventListener("click", this.closeActionMenuHandler, false);
+  }
+
+  calculateActionMenuPosition(parent, initiator) {
+    console.log(parent, initiator);
+    switch (initiator) {
+      case "DRAG_HANDLE_CLICK":
+        const x =
+          parent.offsetLeft - parent.scrollLeft + parent.clientLeft - 90;
+        const y = parent.offsetTop - parent.scrollTop + parent.clientTop + 35;
+        console.log(x, y);
+        return { x: x, y: y };
+      default:
+        return { x: null, y: null };
+    }
+  }
+
+  calculateSelectMenuPosition(initiator) {
+    switch (initiator) {
+      case "KEY_CMD":
+        const { x: caretLeft, y: caretTop } = getCaretCoordinates(true);
+        return { x: caretLeft, y: caretTop };
+      case "ACTION_MENU":
+        console.log("calculating action menu position");
+        const { x: actionX, y: actionY } = this.state.actionMenuPosition;
+        return { x: actionX - 40, y: actionY };
+      default:
+        return { x: null, y: null };
     }
   }
 
@@ -372,11 +428,22 @@ class EditableBlock extends React.Component {
   render() {
     return (
       <>
+        {this.state.selectMenuIsOpen && console.log("it's fucking open")}
+        {this.state.selectMenuIsOpen && console.log("it's fucking open")}
         {this.state.selectMenuIsOpen && (
           <SelectMenu
             position={this.state.selectMenuPosition}
             onSelect={this.tagSelectionHandler}
             close={this.closeSelectMenuHandler}
+          />
+        )}
+        {this.state.actionMenuIsOpen && (
+          <ActionMenu
+            position={this.state.actionMenuPosition}
+            actions={{
+              deleteBlock: () => this.props.deleteBlock({ id: this.props.id }),
+              turnInto: () => this.openSelectMenuHandler("ACTION_MENU"),
+            }}
           />
         )}
 
@@ -387,11 +454,12 @@ class EditableBlock extends React.Component {
                 {this.renderSwitch(this.state.tag, snapshot.isDragging)}
                 <span
                   role="button"
+                  tabIndex="0"
                   className={styles.dragHandle}
                   onClick={this.handleDragHandleClick}
                   {...provided.dragHandleProps}
                 >
-                  <Icon as={DragHandleIcon} />
+                  <img src={DragHandleIcon} alt="Icon" />
                 </span>
               </div>
             </div>

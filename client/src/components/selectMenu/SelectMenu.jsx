@@ -39,6 +39,11 @@ const allowedTags = [
     tag: "ordered",
     label: "Ordered list",
   },
+  {
+    id: "toggle",
+    tag: "toggle",
+    label: "Toggle list",
+  },
 ];
 
 class SelectMenu extends React.Component {

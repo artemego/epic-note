@@ -8,8 +8,9 @@ import ButtonBlock from "../ButtonBlock";
 import SelectMenu from "../selectMenu/SelectMenu";
 import styles from "./editableBlock.module.scss";
 import DragHandleIcon from "../../images/draggable.svg";
+import ToggleList from "../ToggleList";
 
-const listTags = ["unordered", "ordered"];
+const listTags = ["unordered", "ordered", "toggle"];
 class EditableBlock extends React.Component {
   constructor(props) {
     super(props);
@@ -211,7 +212,7 @@ class EditableBlock extends React.Component {
 
   openSelectMenuHandler(trigger) {
     const { x, y } = this.calculateSelectMenuPosition(trigger);
-    console.log(x, y);
+    // console.log(x, y);
     this.setState({
       ...this.state,
       selectMenuPosition: { x: x, y: y },
@@ -300,7 +301,7 @@ class EditableBlock extends React.Component {
           counter: counterValue,
         },
         () => {
-          setCaretToEnd(this.contentEditable.current);
+          if (tag !== "toggle") setCaretToEnd(this.contentEditable.current);
           this.closeSelectMenuHandler();
         }
       );
@@ -407,6 +408,23 @@ class EditableBlock extends React.Component {
             onFocus={this.handleFocus}
           />
         );
+      case "toggle":
+        return (
+          <ToggleList html={this.state.html}>
+            <ContentEditable
+              className={blockClasses}
+              innerRef={this.contentEditable}
+              html={this.state.html}
+              tagName={"ul"}
+              onChange={this.onChangeHandler}
+              onKeyDown={this.onKeyDownHandler}
+              onKeyUp={this.onKeyUpHandler}
+              data-position={this.props.position}
+              onBlur={this.handleBlur}
+              onFocus={this.handleFocus}
+            />
+          </ToggleList>
+        );
       default:
         return (
           <ContentEditable
@@ -428,8 +446,6 @@ class EditableBlock extends React.Component {
   render() {
     return (
       <>
-        {this.state.selectMenuIsOpen && console.log("it's fucking open")}
-        {this.state.selectMenuIsOpen && console.log("it's fucking open")}
         {this.state.selectMenuIsOpen && (
           <SelectMenu
             position={this.state.selectMenuPosition}

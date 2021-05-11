@@ -44,6 +44,11 @@ const allowedTags = [
     tag: "toggle",
     label: "Toggle list",
   },
+  {
+    id: "todo",
+    tag: "todolist",
+    label: "Todo list",
+  },
 ];
 
 class SelectMenu extends React.Component {

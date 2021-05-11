@@ -9,8 +9,9 @@ import SelectMenu from "../selectMenu/SelectMenu";
 import styles from "./editableBlock.module.scss";
 import DragHandleIcon from "../../images/draggable.svg";
 import ToggleList from "../ToggleList";
+import TodoList from "../TodoList";
 
-const listTags = ["unordered", "ordered", "toggle"];
+const listTags = ["unordered", "ordered", "toggle", "todolist"];
 class EditableBlock extends React.Component {
   constructor(props) {
     super(props);
@@ -31,6 +32,8 @@ class EditableBlock extends React.Component {
     this.wrapHtmlLi = this.wrapHtmlLi.bind(this);
     this.isListEmpty = this.isListEmpty.bind(this);
     this.handleDragHandleClick = this.handleDragHandleClick.bind(this);
+    this.handleOverrideHtml = this.handleOverrideHtml.bind(this);
+    this.forceUpdate = this.forceUpdate.bind(this);
     this.state = {
       htmlBackup: null,
       html: "",
@@ -94,10 +97,26 @@ class EditableBlock extends React.Component {
     }
   }
 
+  forceUpdate() {
+    console.log("forced update");
+    this.props.updatePage({
+      id: this.props.id,
+      html: this.state.html,
+      tag: this.state.tag,
+      counter: this.state.counter,
+    });
+  }
+
   onChangeHandler(e) {
     // Здесь сеттится новый html
     console.log("in on change");
     this.setState({ html: e.target.value });
+  }
+
+  handleOverrideHtml(newHtml) {
+    this.setState({ html: newHtml, isTyping: false }, () => {
+      this.forceUpdate();
+    });
   }
 
   handleFocus() {
@@ -424,6 +443,26 @@ class EditableBlock extends React.Component {
               onFocus={this.handleFocus}
             />
           </ToggleList>
+        );
+      case "todolist":
+        return (
+          <TodoList
+            html={this.state.html}
+            overrideHtml={this.handleOverrideHtml}
+          >
+            <ContentEditable
+              className={blockClasses}
+              innerRef={this.contentEditable}
+              html={this.state.html}
+              tagName={"ul"}
+              onChange={this.onChangeHandler}
+              onKeyDown={this.onKeyDownHandler}
+              onKeyUp={this.onKeyUpHandler}
+              data-position={this.props.position}
+              onBlur={this.handleBlur}
+              onFocus={this.handleFocus}
+            />
+          </TodoList>
         );
       default:
         return (

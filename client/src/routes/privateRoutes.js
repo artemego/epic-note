@@ -1,6 +1,5 @@
 import React from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
-import App from "../App";
 import Notes from "../pages/Notes";
 
 // Todo: добавить страницы настроек приложения, пользователя, ...

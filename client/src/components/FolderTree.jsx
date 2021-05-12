@@ -16,7 +16,7 @@ function FolderTree({
   const [tree, setTree] = useState(demoData);
 
   useEffect(() => {
-    // console.log("new pages data ", pagesData);
+    console.log("new pages data ", pagesData);
     if (!pagesData) setTree(demoData);
     else setTree(makeTreeObj(pagesData));
   }, [pagesData]);
@@ -102,10 +102,8 @@ function FolderTree({
   };
 
   const renderItem = ({ item, onExpand, onCollapse, provided }) => {
-    const {
-      style: draggableStyle,
-      ...restDraggableProps
-    } = provided.draggableProps;
+    const { style: draggableStyle, ...restDraggableProps } =
+      provided.draggableProps;
     const hasChildren = item.children && item.children.length > 0;
     return (
       <div

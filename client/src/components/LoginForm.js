@@ -41,7 +41,7 @@ export default function LoginForm() {
 
   // useEffect(() => {
   //   console.log("redirecting" + isAuth);
-  //   if (isAuth) history.push("/notes");
+  //   if (isAuth) history.push("/");
   // }, [isAuth]);
 
   return (

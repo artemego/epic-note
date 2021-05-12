@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import publicRoutes from "./routes/publicRoutes";
 

@@ -1,6 +1,5 @@
 import { Box, Heading, Text } from "@chakra-ui/layout";
 import React from "react";
-import { Link } from "react-router-dom";
 import CustomLink from "../../components/CustomLink";
 import LoginForm from "../../components/LoginForm";
 

@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { Button, ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import PrivateApp from "./PrivateApp";
 import PublicApp from "./PublicApp";
 import { useAuth } from "./context/AuthContext";
 import { useComponentDidUpdate } from "./hooks/useComponentDidUpdate";
 import { QueryClient, QueryClientProvider } from "react-query";
-
 
 function App() {
   const { refreshToken, logout } = useAuth();
@@ -41,12 +40,6 @@ function App() {
       clearTimeout(timer);
     }
   };
-
-  const handleLogout = () => {
-    console.log(isAuth);
-    if (isAuth) logout();
-  };
-
 
   return (
     <div>

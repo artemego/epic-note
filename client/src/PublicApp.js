@@ -1,12 +1,21 @@
-import { useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
+import PlaceholderSplash from "./components/PlaceholderSplash";
+import { useAuth } from "./context/AuthContext";
 import publicRoutes from "./routes/publicRoutes";
 
 function PublicApp() {
+  const { isRefreshing } = useAuth().state;
+
   return (
-    <div className="App">
-      <Router>{publicRoutes}</Router>
-    </div>
+    <>
+      {isRefreshing ? (
+        <PlaceholderSplash />
+      ) : (
+        <div className="App">
+          <Router>{publicRoutes}</Router>
+        </div>
+      )}
+    </>
   );
 }
 

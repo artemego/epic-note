@@ -9,6 +9,7 @@ const initialState = {
   accessToken: null,
   expiryDate: null,
   isLoading: false,
+  isRefreshing: false,
   error: null,
 };
 
@@ -20,6 +21,7 @@ const reducer = (state, action) => {
         accessToken: action.accessToken,
         expiryDate: action.expiryDate,
         isLoading: false,
+        isRefreshing: false,
         error: null,
       };
     }
@@ -32,6 +34,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         isLoading: action.payload,
+      };
+    }
+    case "SET_REFRESHING": {
+      return {
+        ...state,
+        isRefreshing: action.payload,
       };
     }
     case "SET_ERROR": {
@@ -93,6 +101,7 @@ const AuthProvider = ({ children }) => {
   // maybe make this async to return the response obj
   const refreshToken = () => {
     dispatch(ac.changeLoading(true));
+    dispatch(ac.changeRefreshing(true));
     authApi
       .refreshToken()
       .then(({ accessToken, expiresIn }) => {

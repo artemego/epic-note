@@ -22,13 +22,3 @@ export default function Placeholder() {
     </Box>
   );
 }
-// .editor {
-//   min-height: 100vh;
-//   width: 60%;
-//   display: flex;
-//   justify-content: flex-start;
-//   align-items: center;
-//   flex-direction: column;
-//   color: #2f3437;
-//   margin: 1.5vh auto;
-// }

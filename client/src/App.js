@@ -5,10 +5,11 @@ import PublicApp from "./PublicApp";
 import { useAuth } from "./context/AuthContext";
 import { useComponentDidUpdate } from "./hooks/useComponentDidUpdate";
 import { QueryClient, QueryClientProvider } from "react-query";
+import PlaceholderSplash from "./components/PlaceholderSplash";
 
 function App() {
   const { refreshToken, logout } = useAuth();
-  const { isAuth, expiryDate } = useAuth().state;
+  const { isAuth, expiryDate, isRefreshing, isLoading } = useAuth().state;
   const [timer, setTimer] = useState(null);
 
   const queryClient = new QueryClient();
@@ -41,6 +42,13 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    console.log("Is refreshing: " + isRefreshing);
+  }, [isRefreshing]);
+
+  useEffect(() => {
+    console.log("Is loading: " + isLoading);
+  }, [isLoading]);
   return (
     <div>
       <QueryClientProvider client={queryClient}>

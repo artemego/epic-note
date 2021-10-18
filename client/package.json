@@ -30,8 +30,13 @@
   "scripts": {
     "start": "cross-env PORT=3006 react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    }
   },
   "eslintConfig": {
     "extends": [
@@ -52,6 +57,11 @@
     ]
   },
   "devDependencies": {
-    "cross-env": "^7.0.3"
+    "@babel/plugin-transform-modules-commonjs": "^7.14.0",
+    "@babel/preset-env": "^7.14.2",
+    "@babel/preset-react": "^7.13.13",
+    "babel-jest": "^26.6.3",
+    "cross-env": "^7.0.3",
+    "react-test-renderer": "^17.0.2"
   }
 }

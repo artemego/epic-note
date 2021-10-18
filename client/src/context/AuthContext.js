@@ -58,7 +58,6 @@ const reducer = (state, action) => {
 const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // здесь наверное как-то надо добавить useCallback
   const login = ({ email, password }) => {
     dispatch(ac.changeLoading(true));
     authApi
@@ -90,7 +89,6 @@ const AuthProvider = ({ children }) => {
     authApi
       .logout()
       .then(() => {
-        // dispatch(ac.changeLoading(false));
         dispatch(ac.logout());
       })
       .catch(({ error }) => {
@@ -98,7 +96,6 @@ const AuthProvider = ({ children }) => {
       });
   };
   // dispatch refresh token from api, put new accesstoken and exp in context.
-  // maybe make this async to return the response obj
   const refreshToken = () => {
     dispatch(ac.changeLoading(true));
     dispatch(ac.changeRefreshing(true));
@@ -108,7 +105,6 @@ const AuthProvider = ({ children }) => {
         dispatch(ac.loginSuccess(accessToken, expiresIn));
       })
       .catch(({ error }) => {
-        // здесь надо еще выйти из приложения ЕСЛИ ПОЛЬЗОВАТЕЛЬ ЗАЛОГИНЕН.
         dispatch(ac.logout());
         dispatch(ac.setError(error));
       });

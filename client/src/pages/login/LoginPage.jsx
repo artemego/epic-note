@@ -5,7 +5,7 @@ import LoginForm from "../../components/LoginForm";
 
 const LoginPage = () => {
   return (
-    <Box>
+    <Box title="loginPage">
       <Box textAlign="center" mt="4rem">
         <Heading>Sing in to your account</Heading>
         <Text>

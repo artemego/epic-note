@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 // @ts-ignore
-import styles from "./blockEditor.module.css";
-import EditableBlock from "../../components/editableBlock/EditableBlock";
-import { setCaretToEnd } from "../../helpers/setCaretToEnd";
-import usePrevious from "../../hooks/usePrevious";
-import * as notesApi from "../../api/notesApi";
-import objectId from "../../helpers/objectId";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import styles from './blockEditor.module.scss';
+import EditableBlock from '../../components/editableBlock/EditableBlock';
+import { setCaretToEnd } from '../../helpers/setCaretToEnd';
+import usePrevious from '../../hooks/usePrevious';
+import * as notesApi from '../../api/notesApi';
+import objectId from '../../helpers/objectId';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
   const [blocks, setBlocks] = useState(fetchedBlocks);
@@ -14,8 +14,8 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
   const prevBlocks = usePrevious(blocks);
 
   useEffect(() => {
-    console.log("new fetched blocks");
-    if (fetchedBlocks.length === 0) console.log("array length is 0");
+    console.log('new fetched blocks');
+    if (fetchedBlocks.length === 0) console.log('array length is 0');
     setBlocks(fetchedBlocks);
     setCurrentBlockId(null);
     // console.log(fetchedBlocks);
@@ -82,7 +82,7 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
     const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
     // console.log(index);
     const updatedBlocks = [...blocks];
-    const newBlock = { _id: objectId(), tag: "p", html: "" };
+    const newBlock = { _id: objectId(), tag: 'p', html: '' };
     updatedBlocks.splice(index + 1, 0, newBlock);
     // console.log("Updated blocks: " + updatedBlocks);
     updatedBlocks[index] = {

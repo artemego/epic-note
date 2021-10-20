@@ -52,6 +52,7 @@ module.exports = {
     }
   },
   updatePage: async (req, res, next) => {
+    console.log("IN update PAGE");
     try {
       const blocks = req.body.blocks;
       const userId = req.payload.aud;

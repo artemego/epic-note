@@ -1,33 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 // @ts-ignore
-import styles from './blockEditor.module.scss';
-import EditableBlock from '../../components/editableBlock/EditableBlock';
-import { setCaretToEnd } from '../../helpers/setCaretToEnd';
-import usePrevious from '../../hooks/usePrevious';
-import * as notesApi from '../../api/notesApi';
-import objectId from '../../helpers/objectId';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import styles from "./blockEditor.module.scss";
+import EditableBlock from "../../components/editableBlock/EditableBlock";
+import { setCaretToEnd } from "../../helpers/setCaretToEnd";
+import usePrevious from "../../hooks/usePrevious";
+import * as notesApi from "../../api/notesApi";
+import objectId from "../../helpers/objectId";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { useCallback } from "react";
+import { useRef } from "react";
 
 const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
   const [blocks, setBlocks] = useState(fetchedBlocks);
   const [currentBlockId, setCurrentBlockId] = useState(null);
   const prevBlocks = usePrevious(blocks);
+  // используется, чтобы предотвратить отправку новых блоков на сервер, когда мы меняем страницу.
+  // ресетается обратно на true, когда сменяется страница (приходят новые fetchedBlocks)
+  // присваивается значение false, когда происходит какое-то действие с блоками
+  const isFirstRenderWithPage = useRef(true);
 
   useEffect(() => {
-    console.log('new fetched blocks');
-    if (fetchedBlocks.length === 0) console.log('array length is 0');
+    if (fetchedBlocks.length === 0) console.log("array length is 0");
     setBlocks(fetchedBlocks);
     setCurrentBlockId(null);
-    // console.log(fetchedBlocks);
+    isFirstRenderWithPage.current = true;
   }, [fetchedBlocks]);
 
   const updatePageOnServer = async (blocks) => {
-    // console.log("UPDATING SERVER WITH BLOCKS: " + JSON.stringify(blocks));
     notesApi.updatePage(accessToken, pageId, blocks);
   };
 
   useEffect(() => {
-    if (prevBlocks && prevBlocks !== blocks) {
+    if (!isFirstRenderWithPage.current && prevBlocks && prevBlocks !== blocks) {
+      console.log(
+        "UPDATING SERVER WITH BLOCKS: ",
+        blocks,
+        isFirstRenderWithPage.current
+      );
       updatePageOnServer({ blocks: blocks });
     }
   }, [blocks, prevBlocks]);
@@ -54,71 +63,85 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
         `[data-position="${lastBlockPosition}"]`
       );
       if (lastBlock) {
+        console.log("IN LAST BLOCK");
         setCaretToEnd(lastBlock);
       }
     }
   }, [blocks, prevBlocks, currentBlockId]);
 
   // Здесь мы обновляем общий стейт с блоками, а это в свою очередь триггерит useEffect на blocks и prevBlocks, в этом юз эффекте нам и нужно посылать запросы с обновлениями на сервер.
-  const updateBlockHandler = (currentBlock) => {
-    // console.log("In update block handler");
-    const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
-    const oldBlock = blocks[index];
-    const updatedBlocks = [...blocks];
+  const updateBlockHandler = useCallback(
+    (currentBlock) => {
+      console.log("in update block handler");
+      isFirstRenderWithPage.current = false;
+      const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
+      const oldBlock = blocks[index];
+      const updatedBlocks = [...blocks];
 
-    updatedBlocks[index] = {
-      ...updatedBlocks[index],
-      tag: currentBlock.tag,
-      html: currentBlock.html,
-      counter: currentBlock.counter,
-    };
-    setBlocks(updatedBlocks);
-  };
+      updatedBlocks[index] = {
+        ...updatedBlocks[index],
+        tag: currentBlock.tag,
+        html: currentBlock.html,
+        counter: currentBlock.counter,
+      };
+      setBlocks(updatedBlocks);
+    },
+    [blocks]
+  );
 
-  // Вот здесь какая-то муть
-  const addBlockHandler = (currentBlock) => {
-    // console.log(currentBlock);
-    setCurrentBlockId(currentBlock.id);
-    const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
-    // console.log(index);
-    const updatedBlocks = [...blocks];
-    const newBlock = { _id: objectId(), tag: 'p', html: '' };
-    updatedBlocks.splice(index + 1, 0, newBlock);
-    // console.log("Updated blocks: " + updatedBlocks);
-    updatedBlocks[index] = {
-      ...updatedBlocks[index],
-      tag: currentBlock.tag,
-      html: currentBlock.html,
-    };
-    setBlocks(updatedBlocks);
-  };
-
-  const deleteBlockHandler = (currentBlock) => {
-    if (blocks.length > 1) {
+  const addBlockHandler = useCallback(
+    (currentBlock) => {
+      isFirstRenderWithPage.current = false;
       setCurrentBlockId(currentBlock.id);
       const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
-      const deletedBlock = blocks[index];
       const updatedBlocks = [...blocks];
-      updatedBlocks.splice(index, 1);
+      const newBlock = { _id: objectId(), tag: "p", html: "" };
+      updatedBlocks.splice(index + 1, 0, newBlock);
+      // это на тот случай, когда у нас еще не произошло обновление текущего блока через updateBlock (когда пользователь не закончил печатать и нажал enter)
+      updatedBlocks[index] = {
+        ...updatedBlocks[index],
+        tag: currentBlock.tag,
+        html: currentBlock.html,
+      };
       setBlocks(updatedBlocks);
-    }
-  };
+    },
+    [blocks]
+  );
 
-  const onDragEndHandler = (result) => {
-    const { destination, source } = result;
+  const deleteBlockHandler = useCallback(
+    (currentBlock) => {
+      isFirstRenderWithPage.current = false;
+      if (blocks.length > 1) {
+        setCurrentBlockId(currentBlock.id);
+        const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
+        const deletedBlock = blocks[index];
+        const updatedBlocks = [...blocks];
+        updatedBlocks.splice(index, 1);
+        setBlocks(updatedBlocks);
+      }
+    },
+    [blocks]
+  );
 
-    // If we don't have a destination (due to dropping outside the droppable)
-    // or the destination hasn't changed, we change nothing
-    if (!destination || destination.index === source.index) {
-      return;
-    }
+  const onDragEndHandler = useCallback(
+    (result) => {
+      isFirstRenderWithPage.current = false;
+      const { destination, source } = result;
 
-    const updatedBlocks = [...blocks];
-    const removedBlocks = updatedBlocks.splice(source.index - 1, 1);
-    updatedBlocks.splice(destination.index - 1, 0, removedBlocks[0]);
-    setBlocks(updatedBlocks);
-    console.log(destination, source);
-  };
+      // If we don't have a destination (due to dropping outside the droppable)
+      // or the destination hasn't changed, we change nothing
+      if (!destination || destination.index === source.index) {
+        return;
+      }
+
+      const updatedBlocks = [...blocks];
+      const removedBlocks = updatedBlocks.splice(source.index - 1, 1);
+      updatedBlocks.splice(destination.index - 1, 0, removedBlocks[0]);
+      setBlocks(updatedBlocks);
+      console.log(destination, source);
+    },
+    [blocks]
+  );
 
   return (
     <DragDropContext onDragEnd={onDragEndHandler}>

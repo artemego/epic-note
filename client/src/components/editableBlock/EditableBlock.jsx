@@ -16,6 +16,7 @@ class EditableBlock extends React.Component {
   constructor(props) {
     super(props);
     this.contentEditable = React.createRef();
+    this.firstRender = React.createRef();
     this.onChangeHandler = this.onChangeHandler.bind(this);
     this.onKeyDownHandler = this.onKeyDownHandler.bind(this);
     this.onKeyUpHandler = this.onKeyUpHandler.bind(this);
@@ -52,18 +53,19 @@ class EditableBlock extends React.Component {
       isTyping: false,
       placeholder: false,
       counter: undefined,
+      renderCount: 0,
     };
   }
 
   componentDidMount() {
-    // console.log("did mount");
-    // Добавляем placeholder пост, если у первого блока нет вложенных элементов и нет контента.
+    this.firstRender.current = true;
     const hasPlaceholder = this.addPlaceholder({
       block: this.contentEditable.current,
       position: this.props.position,
       content: this.props.html,
     });
     if (!hasPlaceholder) {
+      // initialise html and tag from props
       this.setState({
         html: this.props.html,
         tag: this.props.tag,
@@ -79,15 +81,18 @@ class EditableBlock extends React.Component {
     // берем html из пропсов, потому что нам надо сравнить html до начала печатания с html когда пользователь закончил печатать.
     const htmlChanged = this.props.html !== this.state.html;
     const tagChanged = prevState.tag !== this.state.tag;
+    // чтобы предотвратить вызовы updatePage, когда мы добавляем новый блок
+    const isEnterPrevious = this.state.previousKey === "Enter";
     const buttonChanged =
       this.state.tag === "btn" && prevState.counter !== this.state.counter;
-
-    // здесь нужно будет проверять состояние кастомных компонентов на изменения (сравнивать их с прошлыми).
+    // чтобы предотвратить вызовы updatePage, когда у нас инициализируются пропсы(html и tag) при первом рендере
+    const isFirstRender = this.isFirstRender();
     if (
       ((stoppedTyping && htmlChanged) || tagChanged || buttonChanged) &&
-      hasNoPlaceholder
+      hasNoPlaceholder &&
+      !isEnterPrevious &&
+      !isFirstRender
     ) {
-      console.log("in update page");
       this.props.updatePage({
         id: this.props.id,
         html: this.state.html,
@@ -105,6 +110,12 @@ class EditableBlock extends React.Component {
       tag: this.state.tag,
       counter: this.state.counter,
     });
+  }
+
+  isFirstRender() {
+    const firstRender = this.firstRender.current;
+    this.firstRender.current = false;
+    return firstRender;
   }
 
   onChangeHandler(e) {
@@ -187,7 +198,8 @@ class EditableBlock extends React.Component {
       } else {
         this.props.addBlock({
           id: this.props.id,
-          ref: this.contentEditable.current,
+          tag: this.state.tag,
+          html: this.state.html,
         });
       }
     }
@@ -197,7 +209,8 @@ class EditableBlock extends React.Component {
       console.log("forced enter");
       this.props.addBlock({
         id: this.props.id,
-        ref: this.contentEditable.current,
+        tag: this.state.tag,
+        html: this.state.html,
       });
     }
 
@@ -525,4 +538,4 @@ class EditableBlock extends React.Component {
   }
 }
 
-export default EditableBlock;
+export default React.memo(EditableBlock);

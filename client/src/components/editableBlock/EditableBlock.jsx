@@ -130,6 +130,7 @@ class EditableBlock extends React.Component {
     });
   }
 
+  // TODO: почему-то когда у нас только два блока на странице и мы переключаемся со страницы, где первый блок - placeholder, срабатывает фокус
   handleFocus() {
     console.log("in handle focus");
     // If a placeholder is set, we remove it when the block gets focused
@@ -141,7 +142,7 @@ class EditableBlock extends React.Component {
         isTyping: true,
       });
     } else {
-      this.setState({ ...this.state, isTyping: true });
+      this.setState({ isTyping: true });
     }
   }
 

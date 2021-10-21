@@ -9,6 +9,7 @@ import objectId from "../../helpers/objectId";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { useCallback } from "react";
 import { useRef } from "react";
+import debounce from "lodash.debounce";
 
 const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
   const [blocks, setBlocks] = useState(fetchedBlocks);
@@ -26,7 +27,7 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
     isFirstRenderWithPage.current = true;
   }, [fetchedBlocks]);
 
-  const updatePageOnServer = async (blocks) => {
+  const updatePageOnServer = (blocks, pageId) => {
     notesApi.updatePage(accessToken, pageId, blocks);
   };
 
@@ -37,7 +38,7 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
         blocks,
         isFirstRenderWithPage.current
       );
-      updatePageOnServer({ blocks: blocks });
+      updatePageOnServer({ blocks: blocks }, pageId);
     }
   }, [blocks, prevBlocks]);
 
@@ -70,22 +71,41 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
   }, [blocks, prevBlocks, currentBlockId]);
 
   // Здесь мы обновляем общий стейт с блоками, а это в свою очередь триггерит useEffect на blocks и prevBlocks, в этом юз эффекте нам и нужно посылать запросы с обновлениями на сервер.
-  const updateBlockHandler = useCallback(
-    (currentBlock) => {
-      console.log("in update block handler");
-      isFirstRenderWithPage.current = false;
-      const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
-      const oldBlock = blocks[index];
-      const updatedBlocks = [...blocks];
+  // здесь debounce нам позволит отложить update блоков на сервер до того момента, когда пользователь прекратил печатать
 
-      updatedBlocks[index] = {
-        ...updatedBlocks[index],
-        tag: currentBlock.tag,
-        html: currentBlock.html,
-        counter: currentBlock.counter,
-      };
-      setBlocks(updatedBlocks);
-    },
+  const updateBlockHandler = (currentBlock, localPageId) => {
+    console.log("in update block handler");
+    isFirstRenderWithPage.current = false;
+    const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
+    const updatedBlocks = [...blocks];
+
+    updatedBlocks[index] = {
+      ...updatedBlocks[index],
+      tag: currentBlock.tag,
+      html: currentBlock.html,
+      counter: currentBlock.counter,
+    };
+
+    // когда пользователь сменил страницу пока еще печатал
+    if (pageId !== localPageId) {
+      updatePageOnServer({ blocks: updatedBlocks }, pageId);
+      return;
+    }
+
+    // проверяем, не добавил ли пользователь блок пока печатал (и отменяем в этом случае setBlocks)
+    setBlocks((prevBlocks) => {
+      // ничего не менять, если есть разница в длине между блоками (потому что при добавлении или удалении срабатывает отдельный handler, в котором сетаются блоки)
+      if (prevBlocks.length !== updatedBlocks.length) return prevBlocks;
+      return updatedBlocks;
+    });
+  };
+
+  const debouncedUpdateBlockHandler = useCallback(
+    debounce(
+      (currentBlock, localPageId) =>
+        updateBlockHandler(currentBlock, localPageId),
+      1000
+    ),
     [blocks]
   );
 
@@ -165,8 +185,9 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
                     html={block.html}
                     addBlock={addBlockHandler}
                     deleteBlock={deleteBlockHandler}
-                    updatePage={updateBlockHandler}
+                    updatePage={debouncedUpdateBlockHandler}
                     counter={block.counter}
+                    pageId={pageId}
                   />
                 );
               })}

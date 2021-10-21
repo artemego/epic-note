@@ -58,6 +58,7 @@ class EditableBlock extends React.Component {
   }
 
   componentDidMount() {
+    console.log("in did mount of block");
     this.firstRender.current = true;
     const hasPlaceholder = this.addPlaceholder({
       block: this.contentEditable.current,
@@ -76,7 +77,8 @@ class EditableBlock extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     // console.log("in cdu of block");
-    const stoppedTyping = prevState.isTyping && !this.state.isTyping;
+    // больше не проверяем stoppedTyping, потому что подключен debounce
+    // const stoppedTyping = prevState.isTyping && !this.state.isTyping;
     const hasNoPlaceholder = !this.state.placeholder;
     // берем html из пропсов, потому что нам надо сравнить html до начала печатания с html когда пользователь закончил печатать.
     const htmlChanged = this.props.html !== this.state.html;
@@ -88,17 +90,20 @@ class EditableBlock extends React.Component {
     // чтобы предотвратить вызовы updatePage, когда у нас инициализируются пропсы(html и tag) при первом рендере
     const isFirstRender = this.isFirstRender();
     if (
-      ((stoppedTyping && htmlChanged) || tagChanged || buttonChanged) &&
+      (htmlChanged || tagChanged || buttonChanged) &&
       hasNoPlaceholder &&
       !isEnterPrevious &&
       !isFirstRender
     ) {
-      this.props.updatePage({
-        id: this.props.id,
-        html: this.state.html,
-        tag: this.state.tag,
-        counter: this.state.counter,
-      });
+      this.props.updatePage(
+        {
+          id: this.props.id,
+          html: this.state.html,
+          tag: this.state.tag,
+          counter: this.state.counter,
+        },
+        this.props.pageId
+      );
     }
   }
 

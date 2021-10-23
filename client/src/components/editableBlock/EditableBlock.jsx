@@ -53,7 +53,6 @@ class EditableBlock extends React.Component {
       isTyping: false,
       placeholder: false,
       counter: undefined,
-      renderCount: 0,
     };
   }
 
@@ -409,6 +408,7 @@ class EditableBlock extends React.Component {
               data-position={this.props.position}
               onBlur={this.handleBlur}
               onFocus={this.handleFocus}
+              key={this.props.position}
             />
             <ButtonBlock
               counter={this.state.counter}
@@ -429,6 +429,7 @@ class EditableBlock extends React.Component {
             data-position={this.props.position}
             onBlur={this.handleBlur}
             onFocus={this.handleFocus}
+            key={this.props.position}
           />
         );
       case "ordered":
@@ -444,6 +445,7 @@ class EditableBlock extends React.Component {
             data-position={this.props.position}
             onBlur={this.handleBlur}
             onFocus={this.handleFocus}
+            key={this.props.position}
           />
         );
       case "toggle":
@@ -460,6 +462,7 @@ class EditableBlock extends React.Component {
               data-position={this.props.position}
               onBlur={this.handleBlur}
               onFocus={this.handleFocus}
+              key={this.props.position}
             />
           </ToggleList>
         );
@@ -480,23 +483,27 @@ class EditableBlock extends React.Component {
               data-position={this.props.position}
               onBlur={this.handleBlur}
               onFocus={this.handleFocus}
+              key={this.props.position}
             />
           </TodoList>
         );
       default:
         return (
-          <ContentEditable
-            className={blockClasses}
-            innerRef={this.contentEditable}
-            html={this.state.html}
-            tagName={this.state.tag}
-            onChange={this.onChangeHandler}
-            onKeyDown={this.onKeyDownHandler}
-            onKeyUp={this.onKeyUpHandler}
-            data-position={this.props.position}
-            onBlur={this.handleBlur}
-            onFocus={this.handleFocus}
-          />
+          <>
+            <ContentEditable
+              className={blockClasses}
+              innerRef={this.contentEditable}
+              html={this.state.html}
+              tagName={this.state.tag}
+              onChange={this.onChangeHandler}
+              onKeyDown={this.onKeyDownHandler}
+              onKeyUp={this.onKeyUpHandler}
+              data-position={this.props.position}
+              onBlur={this.handleBlur}
+              onFocus={this.handleFocus}
+              key={this.props.position}
+            />
+          </>
         );
     }
   }
@@ -504,6 +511,7 @@ class EditableBlock extends React.Component {
   render() {
     return (
       <>
+        {console.log("RERENDERING BLOCK")}
         {this.state.selectMenuIsOpen && (
           <SelectMenu
             position={this.state.selectMenuPosition}

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router } from "react-router-dom";
-import PlaceholderSplash from "./components/PlaceholderSplash";
+import Splash from "./components/Splash";
 import { useAuth } from "./context/AuthContext";
 import publicRoutes from "./routes/publicRoutes";
 
@@ -9,7 +9,7 @@ function PublicApp() {
   return (
     <>
       {isRefreshing ? (
-        <PlaceholderSplash />
+        <Splash />
       ) : (
         <div className="App">
           <Router>{publicRoutes}</Router>

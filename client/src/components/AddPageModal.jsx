@@ -8,11 +8,11 @@ import {
   Button,
   FormErrorMessage,
   Box,
-} from '@chakra-ui/react';
-import React from 'react';
-import * as yup from 'yup';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+} from "@chakra-ui/react";
+import React from "react";
+import * as yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 const modalSchema = yup.object().shape({
   pageTitle: yup.string().required(),
@@ -22,7 +22,7 @@ const modalSchema = yup.object().shape({
 
 export default function AddPageModal({ isOpen, onClose, onSave, isLoading }) {
   const { register, handleSubmit, errors } = useForm({
-    mode: 'onBlur',
+    mode: "onChange",
     resolver: yupResolver(modalSchema),
   });
 

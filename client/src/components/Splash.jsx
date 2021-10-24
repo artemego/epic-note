@@ -2,15 +2,16 @@ import { Box } from "@chakra-ui/layout";
 import { Spinner } from "@chakra-ui/spinner";
 import React from "react";
 
-export default function PlaceholderSplash() {
+export default function Splash() {
   console.log("rendered placeholder");
   return (
     <Box
-      h="100vh"
+      h="100%"
       w="100%"
       alignItems="center"
       justifyContent="center"
       display="inline-flex"
+      boxSizing="border-box"
     >
       <Spinner
         color="orange"

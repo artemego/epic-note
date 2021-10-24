@@ -511,7 +511,6 @@ class EditableBlock extends React.Component {
   render() {
     return (
       <>
-        {console.log("RERENDERING BLOCK")}
         {this.state.selectMenuIsOpen && (
           <SelectMenu
             position={this.state.selectMenuPosition}

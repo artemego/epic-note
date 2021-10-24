@@ -106,7 +106,8 @@ const AuthProvider = ({ children }) => {
       })
       .catch(({ error }) => {
         dispatch(ac.logout());
-        dispatch(ac.setError(error));
+        // dispatch(ac.setError(error));
+        console.error(error);
       });
   };
 

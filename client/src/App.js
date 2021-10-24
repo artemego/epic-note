@@ -5,10 +5,9 @@ import PublicApp from "./PublicApp";
 import { useAuth } from "./context/AuthContext";
 import { useComponentDidUpdate } from "./hooks/useComponentDidUpdate";
 import { QueryClient, QueryClientProvider } from "react-query";
-import PlaceholderSplash from "./components/PlaceholderSplash";
 
 function App() {
-  const { refreshToken, logout } = useAuth();
+  const { refreshToken } = useAuth();
   const { isAuth, expiryDate, isRefreshing, isLoading } = useAuth().state;
   const [timer, setTimer] = useState(null);
 

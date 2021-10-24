@@ -7,7 +7,7 @@ const LoginPage = () => {
   return (
     <Box title="loginPage">
       <Box textAlign="center" mt="4rem">
-        <Heading>Sing in to your account</Heading>
+        <Heading>Sign in to your account</Heading>
         <Text>
           Or <CustomLink to={"/register"}>Go to register page</CustomLink>
         </Text>

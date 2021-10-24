@@ -20,6 +20,7 @@ export default function Notes() {
     },
   ]);
   const [isBlank, setIsBlank] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   // при первом рендере сбрасываем маршрут, который остался из publicApp
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function Notes() {
   useEffect(() => {
     console.log("Getting new page");
     console.log(pageId);
+    setIsPageLoading(true);
     if (!pageId || pageId === "login") {
       setIsBlank(true);
     } else {
@@ -37,6 +39,7 @@ export default function Notes() {
       notesApi.getPage(accessToken, pageId).then((res) => {
         console.log(res.page);
         setfetchedBlocks(res.page.blocks);
+        setIsPageLoading(false);
       });
     }
   }, [accessToken, pageId]);
@@ -51,6 +54,7 @@ export default function Notes() {
           fetchedBlocks={fetchedBlocks}
           pageId={pageId}
           accessToken={accessToken}
+          isPageLoading={isPageLoading}
         />
       )}
     </div>

@@ -10,8 +10,9 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { useCallback } from "react";
 import { useRef } from "react";
 import debounce from "lodash.debounce";
+import Splash from "../../components/Splash";
 
-const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
+const BlockEditor = ({ pageId, accessToken, fetchedBlocks, isPageLoading }) => {
   const [blocks, setBlocks] = useState(fetchedBlocks);
   const [currentBlockId, setCurrentBlockId] = useState(null);
   const prevBlocks = usePrevious(blocks);
@@ -166,35 +167,39 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks }) => {
   return (
     <DragDropContext onDragEnd={onDragEndHandler}>
       <div className={styles.editor}>
-        <Droppable droppableId={pageId}>
-          {(provided) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className={styles.droppable}
-            >
-              {blocks.map((block) => {
-                const position =
-                  blocks.map((b) => b._id).indexOf(block._id) + 1;
-                return (
-                  <EditableBlock
-                    key={block._id}
-                    position={position}
-                    id={block._id}
-                    tag={block.tag}
-                    html={block.html}
-                    addBlock={addBlockHandler}
-                    deleteBlock={deleteBlockHandler}
-                    updatePage={debouncedUpdateBlockHandler}
-                    counter={block.counter}
-                    pageId={pageId}
-                  />
-                );
-              })}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
+        {!isPageLoading ? (
+          <Droppable droppableId={pageId}>
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className={styles.droppable}
+              >
+                {blocks.map((block) => {
+                  const position =
+                    blocks.map((b) => b._id).indexOf(block._id) + 1;
+                  return (
+                    <EditableBlock
+                      key={block._id}
+                      position={position}
+                      id={block._id}
+                      tag={block.tag}
+                      html={block.html}
+                      addBlock={addBlockHandler}
+                      deleteBlock={deleteBlockHandler}
+                      updatePage={debouncedUpdateBlockHandler}
+                      counter={block.counter}
+                      pageId={pageId}
+                    />
+                  );
+                })}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        ) : (
+          <Splash />
+        )}
       </div>
     </DragDropContext>
   );

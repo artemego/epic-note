@@ -1,13 +1,15 @@
-import { Box, Text } from '@chakra-ui/layout';
-import React from 'react';
+import { Box, Text } from "@chakra-ui/layout";
+import React from "react";
 
 export default function Placeholder() {
   return (
     <Box
+      h="100vh"
       w="60%"
-      margin="35vh auto"
+      margin="0 auto"
       display="flex"
       alignItems="center"
+      justifyContent="center"
       flexDir="column"
     >
       <Text color="orange.400" as="h2" fontSize="35px">

@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useHistory } from "react-router-dom";
 import userSchema from "../schemas/userSchema";
-import { Link } from "react-router-dom";
 
 import {
   Stack,
@@ -22,7 +21,7 @@ import { useAuth } from "../context/AuthContext";
 // Todo: скорее всего нужно объединить это с registerForm в один файл
 
 export default function LoginForm() {
-  const history = useHistory();
+  // const history = useHistory();
 
   const [showPassword, setShowPassword] = useState(false);
   const { register, handleSubmit, errors } = useForm({
@@ -32,7 +31,7 @@ export default function LoginForm() {
 
   const { login } = useAuth();
 
-  const { isAuth, error, isLoading } = useAuth().state;
+  const { error, isLoading } = useAuth().state;
 
   const handleLogin = (data) => {
     console.log(data);

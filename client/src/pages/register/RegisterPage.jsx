@@ -1,7 +1,7 @@
 import { Box, Heading, Text } from "@chakra-ui/react";
 import React from "react";
-import CustomLink from "../../components/CustomLink";
-import RegisterForm from "../../components/RegisterForm";
+import CustomLink from "../../components/common/CustomLink";
+import RegisterForm from "../../components/auth/RegisterForm";
 
 const RegisterPage = () => {
   return (

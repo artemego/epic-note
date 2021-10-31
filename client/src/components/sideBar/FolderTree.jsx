@@ -50,7 +50,7 @@ function FolderTree({
 
   // это мы будем делать только при первоначальном рендере, добавлении и удалении страницы, при обновлении порядка страниц у нас уже будет правильная структура дерева
   const makeTreeObj = ({ pageItems, rootIds }) => {
-    // console.log("making tree obj");
+    console.log("making tree obj");
     const rootItem = {
       id: "1",
       children: rootIds,
@@ -156,7 +156,7 @@ function FolderTree({
         onExpand={onExpand}
         onCollapse={onCollapse}
         onDragEnd={onDragEnd}
-        offsetPerLevel={16}
+        offsetPerLevel={8}
         isDragEnabled
         isNestingEnabled
       />
@@ -170,10 +170,6 @@ const styles = {
   },
   draggable: {
     backgroundColor: "#edebe8",
-    paddingLeft: 8,
-    paddingRight: 8,
-    paddingTop: 8,
-    paddingBottom: 8,
     display: "flex",
     alignItems: "center",
     borderRadius: "5px",
@@ -192,4 +188,4 @@ const demoData = {
   items: {},
 };
 
-export default FolderTree;
+export default React.memo(FolderTree);

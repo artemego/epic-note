@@ -1,4 +1,4 @@
-import { Button } from '@chakra-ui/button';
+import { Button } from "@chakra-ui/button";
 import {
   Box,
   Flex,
@@ -7,16 +7,17 @@ import {
   useDisclosure,
   VStack,
   Spinner,
-} from '@chakra-ui/react';
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import * as notesApi from '../api/notesApi';
-import { useQuery } from 'react-query';
-import { useHistory } from 'react-router';
-import { AddIcon, ArrowLeftIcon, ArrowRightIcon } from '@chakra-ui/icons';
-import objectId from '../helpers/objectId';
-import FolderTree from './FolderTree';
-import AddPageModal from './AddPageModal';
+} from "@chakra-ui/react";
+import React, { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import * as notesApi from "../../api/notesApi";
+import { useQuery } from "react-query";
+import { useHistory } from "react-router";
+import { AddIcon, ArrowLeftIcon, ArrowRightIcon } from "@chakra-ui/icons";
+import objectId from "../../helpers/objectId";
+import FolderTree from "./FolderTree";
+import AddPageModal from "./AddPageModal";
+import { useCallback } from "react";
 
 export default function SideBar({ pageId }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,68 +31,75 @@ export default function SideBar({ pageId }) {
 
   // react-query
   const { data, error, isLoading, isError, refetch } = useQuery(
-    'pages',
+    "pages",
     async () => {
       return await notesApi.getPages(accessToken);
     }
   );
 
   const btnRef = React.useRef();
-  const position = isOpen ? 'sticky' : 'fixed';
+  const position = isOpen ? "sticky" : "fixed";
 
   const handleLogout = () => {
     logout();
   };
 
-  const handlePageClick = (pageId) => {
-    history.push(`/${pageId}`);
-  };
+  const handlePageClick = useCallback(
+    (pageId) => {
+      history.push(`/${pageId}`);
+    },
+    [history]
+  );
 
-  // console.log("data: " + JSON.stringify(data));
-  // if (!isLoading) {
-  //   console.log(data.pages);
-  // }
-
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     setIsModalOpen(false);
-  };
+  }, []);
 
-  const handleModalOpen = () => {
+  const handleModalOpen = useCallback(() => {
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleModalSaveClick = async ({ pageTitle }) => {
-    // add page запрос на сервер
-    console.log('in handle add page');
-    setIsFetching(true);
-    const initialBlock = { _id: objectId(), tag: 'p', html: '' };
-    await notesApi.addPage(accessToken, pageTitle, initialBlock);
-    setIsFetching(false);
-    setIsModalOpen(false);
-    refetch();
-  };
+  const handleModalSaveClick = useCallback(
+    async ({ pageTitle }) => {
+      // add page запрос на сервер
+      console.log("in handle add page");
+      setIsFetching(true);
+      const initialBlock = { _id: objectId(), tag: "p", html: "" };
+      await notesApi.addPage(accessToken, pageTitle, initialBlock);
+      setIsFetching(false);
+      setIsModalOpen(false);
+      refetch();
+    },
+    [accessToken, refetch]
+  );
 
-  const handlePageDelete = async (pageId) => {
-    // delete page запрос на сервер
-    setIsDeleting(true);
-    setDeletingId(pageId);
-    // console.log("handlePageDelete, id: " + pageId);
-    await notesApi.deletePage(accessToken, pageId);
-    setIsDeleting(false);
-    setDeletingId(null);
-    refetch();
-    console.log('in delete page');
-  };
+  const handlePageDelete = useCallback(
+    async (pageId) => {
+      // delete page запрос на сервер
+      setIsDeleting(true);
+      setDeletingId(pageId);
+      // console.log("handlePageDelete, id: " + pageId);
+      await notesApi.deletePage(accessToken, pageId);
+      setIsDeleting(false);
+      setDeletingId(null);
+      refetch();
+      console.log("in delete page");
+    },
+    [accessToken, refetch]
+  );
 
   // здесь мы просто наверное будем отсылать запрос на обновление страниц, на клиенте обновление уже произойдет в дереве, хотя хз
-  const handleUpdatePages = async (newTree) => {
-    console.log('in update pages');
-    notesApi.updatePages(accessToken, newTree);
-  };
+  const handleUpdatePages = useCallback(
+    async (newTree) => {
+      console.log("in update pages");
+      notesApi.updatePages(accessToken, newTree);
+    },
+    [accessToken]
+  );
 
   return (
     <>
-      <div style={{ position: 'fixed', left: '5px', top: '5px', zIndex: 100 }}>
+      <div style={{ position: "fixed", left: "5px", top: "5px", zIndex: 100 }}>
         <Button ref={btnRef} chcolorSeme="orange" onClick={onToggle}>
           Pages <ArrowRightIcon ml="10px" />
         </Button>
@@ -100,8 +108,8 @@ export default function SideBar({ pageId }) {
         direction="left"
         in={isOpen}
         style={{
-          height: '100vh',
-          width: '300px',
+          height: "100vh",
+          width: "300px",
           zIndex: 100,
           position: position,
         }}
@@ -163,8 +171,8 @@ export default function SideBar({ pageId }) {
             borderWidth="1px"
             m="5px"
             w="100%"
-            _hover={{ bg: '#E8E6E1', cursor: 'pointer' }}
-            style={{ transition: '.2s ease-in-out' }}
+            _hover={{ bg: "#E8E6E1", cursor: "pointer" }}
+            style={{ transition: ".2s ease-in-out" }}
             position="fixed"
             bottom="0px"
             left="0px"

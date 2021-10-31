@@ -18,7 +18,7 @@ import React from "react";
 
 // pageId - текущий выбранный id страницы
 // page - объект с page.pageId и page.name
-export default function PageItem({
+function PageItem({
   handlePageClick,
   handlePageDelete,
   page,
@@ -32,7 +32,7 @@ export default function PageItem({
         if (e.target.nodeName === "svg") return;
         handlePageClick(page.pageId);
       }}
-      p="5px"
+      p="15px 5px"
       ml="5px"
       w="100%"
       h="100%"
@@ -81,3 +81,5 @@ export default function PageItem({
     </Box>
   );
 }
+
+export default React.memo(PageItem);

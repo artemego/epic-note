@@ -10,7 +10,7 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { useCallback } from "react";
 import { useRef } from "react";
 import debounce from "lodash.debounce";
-import Splash from "../../components/Splash";
+import Splash from "../../components/common/Splash";
 
 const BlockEditor = ({ pageId, accessToken, fetchedBlocks, isPageLoading }) => {
   const [blocks, setBlocks] = useState(fetchedBlocks);

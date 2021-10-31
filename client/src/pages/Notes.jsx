@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
-import SideBar from "../components/SideBar";
+import SideBar from "../components/sideBar/SideBar";
 import { useAuth } from "../context/AuthContext";
 import BlockEditor from "./blockEditor/BlockEditor";
 import * as notesApi from "../api/notesApi";
 import { generate } from "shortid";
-import Placeholder from "../components/Placeholder";
+import Placeholder from "../components/common/Placeholder";
 
 export default function Notes() {
   const { accessToken } = useAuth().state;

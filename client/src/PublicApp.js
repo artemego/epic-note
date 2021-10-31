@@ -1,5 +1,5 @@
 import { BrowserRouter as Router } from "react-router-dom";
-import Splash from "./components/Splash";
+import Splash from "./components/common/Splash";
 import { useAuth } from "./context/AuthContext";
 import publicRoutes from "./routes/publicRoutes";
 
@@ -8,8 +8,11 @@ function PublicApp() {
 
   return (
     <>
+      {/* Todo: возможно, здесь нужно будет проверять, залогинен ли уже пользователь */}
       {isRefreshing ? (
-        <Splash />
+        <div style={{ height: "100vh" }}>
+          <Splash />
+        </div>
       ) : (
         <div className="App">
           <Router>{publicRoutes}</Router>

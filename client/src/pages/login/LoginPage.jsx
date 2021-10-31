@@ -1,7 +1,7 @@
 import { Box, Heading, Text } from "@chakra-ui/layout";
 import React from "react";
-import CustomLink from "../../components/CustomLink";
-import LoginForm from "../../components/LoginForm";
+import CustomLink from "../../components/common/CustomLink";
+import LoginForm from "../../components/auth/LoginForm";
 
 const LoginPage = () => {
   return (

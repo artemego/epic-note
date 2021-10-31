@@ -44,3 +44,12 @@
   height: 100%;
   transition: 0.3s;
 }
+
+// custom blocks
+// TODO: доделать завтра
+.todo {
+  li {
+    list-style-type: none;
+    min-height: 3ch;
+  }
+}

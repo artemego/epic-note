@@ -4,12 +4,12 @@ import ContentEditable from "react-contenteditable";
 import { getCaretCoordinates } from "../../helpers/getCaretCoordinates";
 import { setCaretToEnd } from "../../helpers/setCaretToEnd";
 import ActionMenu from "../actionMenu/ActionMenu";
-import ButtonBlock from "../ButtonBlock";
+import ButtonBlock from "../toolBlocks/ButtonBlock";
 import SelectMenu from "../selectMenu/SelectMenu";
 import styles from "./editableBlock.module.scss";
 import DragHandleIcon from "../../images/draggable.svg";
-import ToggleList from "../ToggleList";
-import TodoList from "../TodoList";
+import ToggleList from "../toolBlocks/ToggleList";
+import TodoList from "../toolBlocks/TodoList";
 
 const listTags = ["unordered", "ordered", "toggle", "todolist"];
 class EditableBlock extends React.Component {
@@ -196,7 +196,7 @@ class EditableBlock extends React.Component {
       console.log("Previous key " + this.state.previousKey);
       e.preventDefault();
       if (listTags.includes(this.state.tag)) {
-        console.log("bulleted list");
+        console.log("detected a list tag");
         this.setState((prevState) => {
           return { html: prevState.html + "<li></li>" };
         });
@@ -370,6 +370,12 @@ class EditableBlock extends React.Component {
   wrapHtmlLi(html, tag) {
     console.log("in wrap html");
     if (!listTags.includes(tag)) return html;
+
+    // на случай, когда переключаемся с пустого toggle
+    if (!html) {
+      return "<li></li>";
+    }
+
     return html.includes("<li>") ? html : `<li>${html}</li>`;
   }
 
@@ -473,7 +479,7 @@ class EditableBlock extends React.Component {
             overrideHtml={this.handleOverrideHtml}
           >
             <ContentEditable
-              className={blockClasses}
+              className={`${blockClasses} ${styles.todo}`}
               innerRef={this.contentEditable}
               html={this.state.html}
               tagName={"ul"}

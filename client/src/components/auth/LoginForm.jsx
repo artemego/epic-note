@@ -1,8 +1,9 @@
-import { React, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import userSchema from "../schemas/userSchema";
+import { useHistory } from "react-router-dom";
+import userSchema from "../../schemas/userSchema";
 
 import {
   Stack,
@@ -15,26 +16,36 @@ import {
   FormHelperText,
   FormErrorMessage,
 } from "@chakra-ui/react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
-export default function RegisterForm() {
+// Todo: скорее всего нужно объединить это с registerForm в один файл
+
+export default function LoginForm() {
+  // const history = useHistory();
+
   const [showPassword, setShowPassword] = useState(false);
-
-  const registerUser = useAuth().register;
-
   const { register, handleSubmit, errors } = useForm({
     mode: "onBlur",
     resolver: yupResolver(userSchema),
   });
 
-  const handleRegister = (data) => {
+  const { login } = useAuth();
+
+  const { error, isLoading } = useAuth().state;
+
+  const handleLogin = (data) => {
     console.log(data);
-    registerUser(data);
+    login(data);
   };
+
+  // useEffect(() => {
+  //   console.log("redirecting" + isAuth);
+  //   if (isAuth) history.push("/");
+  // }, [isAuth]);
 
   return (
     <>
-      <form>
+      <form title="loginForm">
         <Stack maxWidth={1200} margin="auto" spacing={5} marginTop={5}>
           <FormControl
             isInvalid={!!errors?.email?.message}
@@ -49,7 +60,9 @@ export default function RegisterForm() {
               ref={register}
             />
             <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
-            <FormHelperText id="email-helper-text">Your email</FormHelperText>
+            <FormHelperText id="email-helper-text">
+              Enter your email
+            </FormHelperText>
           </FormControl>
           <FormControl
             isInvalid={!!errors?.password?.message}
@@ -80,36 +93,33 @@ export default function RegisterForm() {
             </InputGroup>
             <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
             <FormHelperText id="password-helper-text">
-              Your password
+              Enter your password
             </FormHelperText>
           </FormControl>
           <FormControl
-            isInvalid={!!errors?.confirmPassword}
-            errortext={errors?.confirmPassword && "Passwords should match"}
+            isInvalid={!!error?.message}
+            errortext={error?.message}
+            display="flex"
+            alignItems="center"
+            flexDirection="column"
           >
-            <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
-            <Input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              aria-describedby="confirmPassword-helper-text"
-              ref={register}
-            />
-            <FormErrorMessage>
-              {errors.confirmPassword && "Passwords should match"}
-            </FormErrorMessage>
+            <Button
+              type="submit"
+              isLoading={isLoading}
+              onClick={handleSubmit(handleLogin)}
+              colorScheme="orange"
+              w="100%"
+              disabled={
+                !!errors.email ||
+                !!errors.password ||
+                errors.confirmPassword ||
+                isLoading === true
+              }
+            >
+              Login
+            </Button>
+            <FormErrorMessage>{error?.message}</FormErrorMessage>
           </FormControl>
-
-          <Button
-            type="submit"
-            onClick={handleSubmit(handleRegister)}
-            colorScheme="orange"
-            disabled={
-              !!errors.email || !!errors.password || errors.confirmPassword
-            }
-          >
-            Register
-          </Button>
         </Stack>
       </form>
     </>

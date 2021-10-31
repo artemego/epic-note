@@ -11,6 +11,7 @@ export default function Placeholder() {
       alignItems="center"
       justifyContent="center"
       flexDir="column"
+      textAlign="center"
     >
       <Text color="orange.400" as="h2" fontSize="35px">
         No page selected

@@ -83,7 +83,9 @@ export default function SideBar({ pageId }) {
       setIsDeleting(false);
       setDeletingId(null);
       refetch();
-      console.log("in delete page");
+      // перенаправляем пользователя на placeholder страницу, если удаляется выбранная страница
+      debugger;
+      if (history.location.pathname === `/${pageId}`) history.push(`/`);
     },
     [accessToken, refetch]
   );

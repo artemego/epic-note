@@ -84,7 +84,7 @@ export default function SideBar({ pageId }) {
       setDeletingId(null);
       refetch();
       // перенаправляем пользователя на placeholder страницу, если удаляется выбранная страница
-      debugger;
+      // debugger;
       if (history.location.pathname === `/${pageId}`) history.push(`/`);
     },
     [accessToken, refetch]
@@ -146,8 +146,14 @@ export default function SideBar({ pageId }) {
               </Button>
             </Flex>
           </Box>
+          {console.log("DATA PAGES: ", data)}
           {isLoading ? (
             <Spinner />
+          ) : !data.pages.rootIds.length ? (
+            <Box p="10px" height="100%" textAlign="center" color="gray.600">
+              You have no pages, click <b>new page</b> button to create a new
+              page
+            </Box>
           ) : (
             <FolderTree
               handlePageClick={handlePageClick}
@@ -159,7 +165,6 @@ export default function SideBar({ pageId }) {
               pagesData={data.pages}
             />
           )}
-
           <AddPageModal
             isOpen={isModalOpen}
             onClose={handleModalClose}

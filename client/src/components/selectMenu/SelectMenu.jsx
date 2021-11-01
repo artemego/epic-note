@@ -1,53 +1,53 @@
-import React from 'react';
-import { matchSorter } from 'match-sorter';
-import styles from './selectMenu.module.scss';
+import React from "react";
+import { matchSorter } from "match-sorter";
+import styles from "./selectMenu.module.scss";
 
 const MENU_HEIGHT = 150;
 const allowedTags = [
   {
-    id: 'page-title',
-    tag: 'h1',
-    label: 'Page Title',
+    id: "page-title",
+    tag: "h1",
+    label: "Page Title",
   },
   {
-    id: 'heading',
-    tag: 'h2',
-    label: 'Heading',
+    id: "heading",
+    tag: "h2",
+    label: "Heading",
   },
   {
-    id: 'subheading',
-    tag: 'h3',
-    label: 'Subheading',
+    id: "subheading",
+    tag: "h3",
+    label: "Subheading",
   },
   {
-    id: 'paragraph',
-    tag: 'p',
-    label: 'Paragraph',
+    id: "paragraph",
+    tag: "p",
+    label: "Paragraph",
   },
   {
-    id: 'counter',
-    tag: 'btn',
-    label: 'Counter',
+    id: "counter",
+    tag: "btn",
+    label: "Counter",
   },
   {
-    id: 'unordered',
-    tag: 'unordered',
-    label: 'Unordered list',
+    id: "unordered",
+    tag: "unordered",
+    label: "Unordered list",
   },
   {
-    id: 'ordered',
-    tag: 'ordered',
-    label: 'Ordered list',
+    id: "ordered",
+    tag: "ordered",
+    label: "Ordered list",
   },
   {
-    id: 'toggle',
-    tag: 'toggle',
-    label: 'Toggle list',
+    id: "toggle",
+    tag: "toggle",
+    label: "Toggle list",
   },
   {
-    id: 'todo',
-    tag: 'todolist',
-    label: 'Todo list',
+    id: "todo",
+    tag: "todolist",
+    label: "Todo list",
   },
 ];
 
@@ -56,28 +56,29 @@ class SelectMenu extends React.Component {
     super(props);
     this.keyDownHandler = this.keyDownHandler.bind(this);
     this.state = {
-      command: '',
+      command: "",
       items: allowedTags,
       selectedItem: 0,
     };
+    this.menuRef = React.createRef();
   }
 
   componentDidMount() {
-    console.log('mounted select menu');
-    document.addEventListener('keydown', this.keyDownHandler);
+    console.log("mounted select menu");
+    document.addEventListener("keydown", this.keyDownHandler);
   }
 
   componentDidUpdate(prevProps, prevState) {
     const command = this.state.command;
     if (prevState.command !== command) {
-      const items = matchSorter(allowedTags, command, { keys: ['tag'] });
-      console.log('found items: ' + items);
+      const items = matchSorter(allowedTags, command, { keys: ["tag"] });
+      console.log("found items: " + items);
       this.setState({ items: items });
     }
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keydown', this.keyDownHandler);
+    document.removeEventListener("keydown", this.keyDownHandler);
   }
 
   keyDownHandler(e) {
@@ -86,23 +87,23 @@ class SelectMenu extends React.Component {
     const command = this.state.command;
 
     switch (e.key) {
-      case 'Enter':
+      case "Enter":
         // здесь на enter просто приходит любое введенное значение, даже не проверяется на верность тэга
         e.preventDefault();
         if (!items[selected]?.tag) return;
         this.props.onSelect(items[selected]?.tag);
         break;
-      case 'Backspace':
+      case "Backspace":
         if (!command) this.props.close();
         this.setState({ command: command.substring(0, command.length - 1) });
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
         const prevSelected = selected === 0 ? items.length - 1 : selected - 1;
         this.setState({ selectedItem: prevSelected });
         break;
-      case 'ArrowDown':
-      case 'Tab':
+      case "ArrowDown":
+      case "Tab":
         e.preventDefault();
         const nextSelected = selected === items.length - 1 ? 0 : selected + 1;
         this.setState({ selectedItem: nextSelected });
@@ -115,14 +116,24 @@ class SelectMenu extends React.Component {
   }
 
   render() {
+    const isMenuOutsideOfTopViewport = this.props.position.y - 353 < 0;
+    const y = !isMenuOutsideOfTopViewport
+      ? this.props.position.y - MENU_HEIGHT
+      : this.props.position.y + MENU_HEIGHT / 3 - 20;
     const x = this.props.position.x;
-    const y = this.props.position.y - MENU_HEIGHT;
-    const positionAttributes = { top: y, left: x };
-
-    console.log(positionAttributes);
 
     return (
-      <div className={styles.selectMenu} style={positionAttributes}>
+      <div
+        ref={this.menuRef}
+        className={styles.selectMenu}
+        style={{
+          top: y,
+          left: x,
+          justifyContent: !isMenuOutsideOfTopViewport
+            ? "flex-end"
+            : "flex-start",
+        }}
+      >
         <div className={styles.Items}>
           {this.state.items.map((item, key) => {
             const selectedItem = this.state.selectedItem;

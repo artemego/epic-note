@@ -81,6 +81,7 @@ class EditableBlock extends React.Component {
     const hasNoPlaceholder = !this.state.placeholder;
     // берем html из пропсов, потому что нам надо сравнить html до начала печатания с html когда пользователь закончил печатать.
     const htmlChanged = this.props.html !== this.state.html;
+    const selectMenuIsClosed = !this.state.selectMenuIsOpen;
     const tagChanged = prevState.tag !== this.state.tag;
     // чтобы предотвратить вызовы updatePage, когда мы добавляем новый блок
     const isEnterPrevious = this.state.previousKey === "Enter";
@@ -92,7 +93,8 @@ class EditableBlock extends React.Component {
       (htmlChanged || tagChanged || buttonChanged) &&
       hasNoPlaceholder &&
       !isEnterPrevious &&
-      !isFirstRender
+      !isFirstRender &&
+      selectMenuIsClosed
     ) {
       this.props.updatePage(
         {
@@ -295,10 +297,12 @@ class EditableBlock extends React.Component {
     document.removeEventListener("click", this.closeActionMenuHandler, false);
   }
 
+  // мне кажется, что для select menu нам нужно будет совмещать подход action menu с прошлым подходом, чтобы сохранить позицию курсора.
   calculateActionMenuPosition(parent, initiator) {
     console.log(parent, initiator);
     switch (initiator) {
       case "DRAG_HANDLE_CLICK":
+        // debugger;
         const x =
           parent.offsetLeft - parent.scrollLeft + parent.clientLeft - 90;
         const y = parent.offsetTop - parent.scrollTop + parent.clientTop + 35;
@@ -309,15 +313,17 @@ class EditableBlock extends React.Component {
     }
   }
 
+  // здесь в качестве parent нужно будет передать тот блок, в котором было вызвано меню
+  // TODO: при клике на turn into нужно еще закрывать action menu
   calculateSelectMenuPosition(initiator) {
     switch (initiator) {
       case "KEY_CMD":
-        const { x: caretLeft, y: caretTop } = getCaretCoordinates(true);
+        const { x: caretLeft, y: caretTop } = getCaretCoordinates(false);
         return { x: caretLeft, y: caretTop };
       case "ACTION_MENU":
         console.log("calculating action menu position");
         const { x: actionX, y: actionY } = this.state.actionMenuPosition;
-        return { x: actionX - 40, y: actionY };
+        return { x: actionX - 40, y: actionY - 40 };
       default:
         return { x: null, y: null };
     }

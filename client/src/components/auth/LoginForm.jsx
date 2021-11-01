@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useHistory } from "react-router-dom";
 import userSchema from "../../schemas/userSchema";
 
 import {
@@ -15,14 +14,12 @@ import {
   InputRightElement,
   FormHelperText,
   FormErrorMessage,
+  IconButton,
 } from "@chakra-ui/react";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "../../context/AuthContext";
 
-// Todo: скорее всего нужно объединить это с registerForm в один файл
-
 export default function LoginForm() {
-  // const history = useHistory();
-
   const [showPassword, setShowPassword] = useState(false);
   const { register, handleSubmit, errors } = useForm({
     mode: "onBlur",
@@ -37,11 +34,6 @@ export default function LoginForm() {
     console.log(data);
     login(data);
   };
-
-  // useEffect(() => {
-  //   console.log("redirecting" + isAuth);
-  //   if (isAuth) history.push("/");
-  // }, [isAuth]);
 
   return (
     <>
@@ -79,16 +71,15 @@ export default function LoginForm() {
                 ref={register}
               />
               <InputRightElement>
-                <Button
+                <IconButton
                   h="1.75rem"
                   size="sm"
                   mr="1rem"
                   onClick={() => {
                     setShowPassword(!showPassword);
                   }}
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </Button>
+                  icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                />
               </InputRightElement>
             </InputGroup>
             <FormErrorMessage>{errors.password?.message}</FormErrorMessage>

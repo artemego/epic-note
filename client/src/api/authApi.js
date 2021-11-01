@@ -1,12 +1,11 @@
+import { getUserInfo } from "./userApi";
+
 const AUTH_URL = "http://localhost:3000/auth";
 const REGISTER = "register";
 const LOGIN = "login";
 const LOGOUT = "logout";
 const REFRESH_TOKEN = "refresh-token";
 
-// TODO: создать два вида конфига: с куки, с ХЭДЕРОМ AUTHENTICATION И BEARER ТОКЕНОМ
-
-// клиент, который будет посылать наши запросы
 async function client(endpoint, data = null, method = "POST") {
   const stringData = data ? JSON.stringify(data) : null;
   const config = {
@@ -34,21 +33,24 @@ async function client(endpoint, data = null, method = "POST") {
   });
 }
 
-function login({ email, password }) {
-  return client(LOGIN, { email, password }).then(handleUserResponse);
+async function login({ email, password }) {
+  const loginRes = await client(LOGIN, { email, password });
+  const { info } = await handleUserResponse(loginRes);
+  return { ...loginRes, info };
 }
 
-function register({ email, password }) {
-  return client(REGISTER, { email, password }).then(handleUserResponse);
+async function register({ email, password }) {
+  const registerRes = await client(REGISTER, { email, password });
+  const { info } = await handleUserResponse(registerRes);
+  return { ...registerRes, info };
 }
 
-// здесь может быть проверить, есть ли информация о пользователе прежде чем вызывать handleUserResponse
 async function refreshToken() {
   const response = await client(REFRESH_TOKEN);
   // console.log(response);
   // если user существует, то не вызываем - уже есть о нем инфа
-  handleUserResponse(response);
-  return response;
+  const { info } = await handleUserResponse(response);
+  return { ...response, info };
 }
 
 async function logout() {
@@ -56,12 +58,12 @@ async function logout() {
 }
 
 // коллбэк, который вызывается после того как придет информация о пользователе
-function handleUserResponse(response) {
-  // Todo: здесь надо будет записывать информацию о пользователе в UserContext
+async function handleUserResponse(response) {
   if (!response) return;
-  // const {accessToken, expiresIn} = response;
-  console.log(response);
-  return response;
+  const { accessToken } = response;
+  // api call from user api
+  const userInfo = await getUserInfo(accessToken);
+  return userInfo;
 }
 
 export { login, register, logout, refreshToken };

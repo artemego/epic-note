@@ -6,6 +6,7 @@ import {
   Slide,
   useDisclosure,
   VStack,
+  Divider,
   Spinner,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
@@ -26,7 +27,7 @@ export default function SideBar({ pageId }) {
   const [deletingId, setDeletingId] = useState(null);
   const { isOpen, onToggle } = useDisclosure();
   const { logout } = useAuth();
-  const { accessToken } = useAuth().state;
+  const { accessToken, email } = useAuth().state;
   const history = useHistory();
 
   // react-query
@@ -84,7 +85,6 @@ export default function SideBar({ pageId }) {
       setDeletingId(null);
       refetch();
       // перенаправляем пользователя на placeholder страницу, если удаляется выбранная страница
-      // debugger;
       if (history.location.pathname === `/${pageId}`) history.push(`/`);
     },
     [accessToken, refetch]
@@ -126,7 +126,7 @@ export default function SideBar({ pageId }) {
           overflowX="hidden"
         >
           <Box p={2.5} mr="5px" ml="5px" w="100%" position="relative">
-            <Flex justifyContent="space-between">
+            <Flex justifyContent="space-between" mb="10px">
               <Heading fontSize={28}>User Pages </Heading>
               <Button
                 aria-label="Close Control Panel"
@@ -145,6 +145,11 @@ export default function SideBar({ pageId }) {
                 <ArrowLeftIcon ml="10px" />
               </Button>
             </Flex>
+            <Divider orientation="horizontal" />
+            <Box p="5px 0px" fontWeight="500" color="gray.600">
+              Logged in as {email}
+            </Box>
+            <Divider orientation="horizontal" />
           </Box>
           {console.log("DATA PAGES: ", data)}
           {isLoading ? (

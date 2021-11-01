@@ -1,5 +1,4 @@
 import { React, useState } from "react";
-
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import userSchema from "../../schemas/userSchema";
@@ -14,8 +13,10 @@ import {
   InputRightElement,
   FormHelperText,
   FormErrorMessage,
+  IconButton,
 } from "@chakra-ui/react";
 import { useAuth } from "../../context/AuthContext";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -66,16 +67,15 @@ export default function RegisterForm() {
                 ref={register}
               />
               <InputRightElement>
-                <Button
+                <IconButton
                   h="1.75rem"
                   size="sm"
                   mr="1rem"
                   onClick={() => {
                     setShowPassword(!showPassword);
                   }}
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </Button>
+                  icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                />
               </InputRightElement>
             </InputGroup>
             <FormErrorMessage>{errors.password?.message}</FormErrorMessage>

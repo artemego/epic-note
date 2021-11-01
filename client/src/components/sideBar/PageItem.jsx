@@ -73,17 +73,12 @@ function PageItem({
                 handlePageDelete(page.pageId);
               }}
               icon={<DeleteIcon />}
-              command="⌘T"
               // onClick={handlePageDelete(page.id)}
             >
               Delete page
             </MenuItem>
-            <MenuItem icon={<CopyIcon />} command="⌘N">
-              Duplicate
-            </MenuItem>
-            <MenuItem icon={<EditIcon />} command="⌘N">
-              Change name
-            </MenuItem>
+            <MenuItem icon={<CopyIcon />}>Duplicate</MenuItem>
+            <MenuItem icon={<EditIcon />}>Change name</MenuItem>
           </MenuList>
         </Menu>
       </Box>

@@ -135,4 +135,27 @@ module.exports = {
       next(error);
     }
   },
+  // get user info
+  info: async (req, res, next) => {
+    try {
+      const userId = req.payload.aud;
+      console.log(userId);
+      const user = await User.findById(userId);
+      if (!user) {
+        const err = new Error("Could not find user by id.");
+        err.statusCode = 404;
+        throw err;
+      }
+
+      const info = {
+        email: user.email,
+      };
+      res.status(200).json({
+        message: "user info",
+        info,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
 };

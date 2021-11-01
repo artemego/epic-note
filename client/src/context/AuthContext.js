@@ -11,6 +11,7 @@ const initialState = {
   isLoading: false,
   isRefreshing: false,
   error: null,
+  email: "",
 };
 
 const reducer = (state, action) => {
@@ -23,6 +24,7 @@ const reducer = (state, action) => {
         isLoading: false,
         isRefreshing: false,
         error: null,
+        email: action.info.email,
       };
     }
     case "LOGOUT": {
@@ -62,8 +64,8 @@ const AuthProvider = ({ children }) => {
     dispatch(ac.changeLoading(true));
     authApi
       .login({ email, password })
-      .then(({ accessToken, expiresIn }) => {
-        dispatch(ac.loginSuccess(accessToken, expiresIn));
+      .then(({ accessToken, expiresIn, info }) => {
+        dispatch(ac.loginSuccess(accessToken, expiresIn, info));
       })
       .catch(({ error }) => {
         dispatch(ac.setError(error));
@@ -75,8 +77,8 @@ const AuthProvider = ({ children }) => {
     dispatch(ac.changeLoading(true));
     authApi
       .register({ email, password })
-      .then(({ accessToken, expiresIn }) => {
-        dispatch(ac.loginSuccess(accessToken, expiresIn));
+      .then(({ accessToken, expiresIn, info }) => {
+        dispatch(ac.loginSuccess(accessToken, expiresIn, info));
       })
       .catch(({ error }) => {
         dispatch(ac.setError(error));
@@ -101,12 +103,11 @@ const AuthProvider = ({ children }) => {
     dispatch(ac.changeRefreshing(true));
     authApi
       .refreshToken()
-      .then(({ accessToken, expiresIn }) => {
-        dispatch(ac.loginSuccess(accessToken, expiresIn));
+      .then(({ accessToken, expiresIn, info }) => {
+        dispatch(ac.loginSuccess(accessToken, expiresIn, info));
       })
       .catch(({ error }) => {
         dispatch(ac.logout());
-        // dispatch(ac.setError(error));
         console.error(error);
       });
   };

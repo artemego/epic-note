@@ -6,11 +6,12 @@ const SET_ERROR = "SET_ERROR";
 
 // actionCreators
 
-const loginSuccess = (accessToken, expiryDate) => {
+const loginSuccess = (accessToken, expiryDate, info) => {
   return {
     type: LOGIN_SUCCESS,
     accessToken: accessToken,
     expiryDate: expiryDate,
+    info: info,
   };
 };
 

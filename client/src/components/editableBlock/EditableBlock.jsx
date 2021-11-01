@@ -302,7 +302,6 @@ class EditableBlock extends React.Component {
     console.log(parent, initiator);
     switch (initiator) {
       case "DRAG_HANDLE_CLICK":
-        // debugger;
         const x =
           parent.offsetLeft - parent.scrollLeft + parent.clientLeft - 90;
         const y = parent.offsetTop - parent.scrollTop + parent.clientTop + 35;

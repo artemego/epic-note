@@ -170,7 +170,6 @@ module.exports = {
         const deletedPage = await Page.findByIdAndDelete(pageId);
         // Обновляем коллекцию пользователей
         if (creatorId) {
-          debugger;
           const user = await User.findById(userId);
           if (!user) {
             const err = new Error("Could not find user by id.");

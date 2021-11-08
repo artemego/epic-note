@@ -53,7 +53,13 @@ const UserSchema = new Schema(
       pageItems: [PageObj],
       rootIds: [Schema.Types.ObjectId],
     },
+    isGuest: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
+
   { timestamps: true }
 );
 

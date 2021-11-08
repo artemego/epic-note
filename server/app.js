@@ -7,9 +7,11 @@ require("dotenv").config();
 require("./helpers/init_mongodb");
 require("./helpers/init_redis");
 const { verifyAccessToken } = require("./helpers/jwt_helper");
+const schedule = require("node-schedule");
 
 const AuthRoute = require("./routes/Auth");
 const NotesRoute = require("./routes/Notes");
+const deleteGuestUsers = require("./helpers/deleteGuestUsers");
 
 const app = express();
 
@@ -42,6 +44,11 @@ app.use("/notes", NotesRoute);
 // path not found error
 app.use(async (req, res, next) => {
   next(createError.NotFound());
+});
+
+// delete guest users job - runs every 2 hours
+const job = schedule.scheduleJob("*/2 * * *", async () => {
+  await deleteGuestUsers();
 });
 
 // обработка ошибок

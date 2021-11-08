@@ -8,6 +8,7 @@ const {
   verifyRefreshToken,
 } = require("../helpers/jwt_helper");
 const client = require("../helpers/init_redis");
+const shortid = require("shortid");
 
 const checkIfTokenExists = (obj) => {
   if (obj && obj.refreshToken && Object.keys(obj.refreshToken).length) {
@@ -45,6 +46,37 @@ module.exports = {
     } catch (error) {
       // if it's validation error change status to 422
       if (error.isJoi === true) error.status = 422;
+      next(error);
+    }
+  },
+  registerGuest: async (req, res, next) => {
+    try {
+      // generate guest user email and password
+      const guestId = shortid();
+      const guestObj = {
+        email: `Guest${guestId}@epicnote.com`,
+        password: "guest",
+        isGuest: true,
+      };
+      // проверка на коллизию
+      const doesExist = await User.findOne({ email: guestObj.email });
+      if (doesExist) {
+        throw createHttpError.Conflict(
+          `${result.email} has already been registered`
+        );
+      }
+      const user = new User(guestObj);
+      await user.hashPassword();
+      const savedUser = await user.save();
+      const { accessToken, expiresIn } = await signAccessToken(savedUser.id);
+      const refreshToken = await signRefreshToken(savedUser.id);
+      res.cookie(
+        "JWT",
+        { refreshToken },
+        { maxAge: 86_400_000, httpOnly: true }
+      );
+      res.send({ accessToken, expiresIn });
+    } catch (error) {
       next(error);
     }
   },

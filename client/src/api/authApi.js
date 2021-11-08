@@ -2,6 +2,7 @@ import { getUserInfo } from "./userApi";
 
 const AUTH_URL = "http://localhost:3000/auth";
 const REGISTER = "register";
+const REGISTER_GUEST = "register-guest";
 const LOGIN = "login";
 const LOGOUT = "logout";
 const REFRESH_TOKEN = "refresh-token";
@@ -45,6 +46,12 @@ async function register({ email, password }) {
   return { ...registerRes, info };
 }
 
+async function registerGuest() {
+  const registerRes = await client(REGISTER_GUEST);
+  const { info } = await handleUserResponse(registerRes);
+  return { ...registerRes, info };
+}
+
 async function refreshToken() {
   const response = await client(REFRESH_TOKEN);
   // console.log(response);
@@ -66,4 +73,4 @@ async function handleUserResponse(response) {
   return userInfo;
 }
 
-export { login, register, logout, refreshToken };
+export { login, register, logout, refreshToken, registerGuest };

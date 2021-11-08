@@ -85,6 +85,18 @@ const AuthProvider = ({ children }) => {
       });
   };
 
+  const registerGuest = () => {
+    dispatch(ac.changeLoading(true));
+    authApi
+      .registerGuest()
+      .then(({ accessToken, expiresIn, info }) => {
+        dispatch(ac.loginSuccess(accessToken, expiresIn, info));
+      })
+      .catch(({ error }) => {
+        dispatch(ac.setError(error));
+      });
+  };
+
   // send logout request, dispatch refresh to userContext and authContext.
   const logout = () => {
     dispatch(ac.changeLoading(true));
@@ -114,7 +126,7 @@ const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ state, login, register, logout, refreshToken }}
+      value={{ state, login, register, logout, refreshToken, registerGuest }}
     >
       {children}
     </AuthContext.Provider>

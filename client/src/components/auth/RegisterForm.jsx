@@ -36,7 +36,13 @@ export default function RegisterForm() {
   return (
     <>
       <form>
-        <Stack maxWidth={1200} margin="auto" spacing={5} marginTop={5}>
+        <Stack
+          maxWidth={1200}
+          margin="auto"
+          spacing={5}
+          marginTop={5}
+          textAlign="left"
+        >
           <FormControl
             isInvalid={!!errors?.email?.message}
             errortext={errors?.email?.message}

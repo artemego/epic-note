@@ -20,7 +20,9 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.14",
     "morgan": "^1.10.0",
+    "node-schedule": "^2.0.0",
     "nodemon": "^2.0.6",
-    "redis": "^3.0.2"
+    "redis": "^3.0.2",
+    "shortid": "^2.2.16"
   }
 }

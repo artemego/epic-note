@@ -1,6 +1,8 @@
 const createHttpError = require("http-errors");
 
+const Page = require("../models/Page");
 const User = require("../models/User");
+
 const { authSchema } = require("../helpers/validation_schema");
 const {
   signAccessToken,
@@ -9,6 +11,7 @@ const {
 } = require("../helpers/jwt_helper");
 const client = require("../helpers/init_redis");
 const shortid = require("shortid");
+const { mockPages } = require("../mockdata");
 
 const checkIfTokenExists = (obj) => {
   if (obj && obj.refreshToken && Object.keys(obj.refreshToken).length) {
@@ -68,8 +71,42 @@ module.exports = {
       const user = new User(guestObj);
       await user.hashPassword();
       const savedUser = await user.save();
-      const { accessToken, expiresIn } = await signAccessToken(savedUser.id);
-      const refreshToken = await signRefreshToken(savedUser.id);
+      const userId = savedUser.id;
+      const { accessToken, expiresIn } = await signAccessToken(userId);
+      const refreshToken = await signRefreshToken(userId);
+
+      // generate mock pages and insert them into pages collection and guest user pageObj
+
+      // make pages to insert
+      const pages = mockPages.map((mockPage) => {
+        const page = new Page({
+          blocks: mockPage.blocks,
+          creator: userId,
+          name: mockPage.name,
+        });
+        return page;
+      });
+
+      // insert mock pages
+      const savedPages = await Page.insertMany(pages);
+
+      // insert page ids into user collection
+      savedPages.forEach((page) => {
+        user.pages.pageItems.push({
+          id: page._id.toString(),
+          children: [],
+          hasChildren: false,
+          isExpanded: false,
+          isChildrenLoading: false,
+          data: {
+            title: page.name,
+          },
+        });
+        user.pages.rootIds.push(page._id.toString());
+      });
+
+      await user.save();
+
       res.cookie(
         "JWT",
         { refreshToken },
@@ -77,6 +114,7 @@ module.exports = {
       );
       res.send({ accessToken, expiresIn });
     } catch (error) {
+      console.log(error);
       next(error);
     }
   },

@@ -1,7 +1,7 @@
-const NOTES_URL = "http://localhost:3000/notes";
-// const GET_PAGES = "pages";
+const { REACT_APP_SERVER_URL } = process.env;
 
-// клиент, который будет посылать наши запросы
+const NOTES_URL = `${REACT_APP_SERVER_URL}/notes`;
+
 async function client(endpoint, data = null, method = "POST", accessToken) {
   if (!endpoint) endpoint = "";
   const authString = `Bearer ${accessToken}`;

@@ -1,4 +1,6 @@
-const USER_URL = "http://localhost:3000/auth";
+const { REACT_APP_SERVER_URL } = process.env;
+
+const USER_URL = `${REACT_APP_SERVER_URL}/auth`;
 
 const INFO = "info";
 

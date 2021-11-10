@@ -1,6 +1,7 @@
 import { getUserInfo } from "./userApi";
+const { REACT_APP_SERVER_URL } = process.env;
 
-const AUTH_URL = "http://localhost:3000/auth";
+const AUTH_URL = `${REACT_APP_SERVER_URL}/auth`;
 const REGISTER = "register";
 const REGISTER_GUEST = "register-guest";
 const LOGIN = "login";

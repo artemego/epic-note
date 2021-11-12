@@ -22,7 +22,6 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks, isPageLoading }) => {
   const isFirstRenderWithPage = useRef(true);
 
   useEffect(() => {
-    if (fetchedBlocks.length === 0) console.log("array length is 0");
     setBlocks(fetchedBlocks);
     setCurrentBlockId(null);
     isFirstRenderWithPage.current = true;
@@ -34,11 +33,6 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks, isPageLoading }) => {
 
   useEffect(() => {
     if (!isFirstRenderWithPage.current && prevBlocks && prevBlocks !== blocks) {
-      console.log(
-        "UPDATING SERVER WITH BLOCKS: ",
-        blocks,
-        isFirstRenderWithPage.current
-      );
       updatePageOnServer({ blocks: blocks }, pageId);
     }
   }, [blocks, prevBlocks]);
@@ -65,7 +59,6 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks, isPageLoading }) => {
         `[data-position="${lastBlockPosition}"]`
       );
       if (lastBlock) {
-        console.log("IN LAST BLOCK");
         setCaretToEnd(lastBlock);
       }
     }
@@ -75,7 +68,6 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks, isPageLoading }) => {
   // здесь debounce нам позволит отложить update блоков на сервер до того момента, когда пользователь прекратил печатать
 
   const updateBlockHandler = (currentBlock, localPageId) => {
-    console.log("in update block handler");
     isFirstRenderWithPage.current = false;
     const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
     const updatedBlocks = [...blocks];
@@ -159,7 +151,6 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks, isPageLoading }) => {
       const removedBlocks = updatedBlocks.splice(source.index - 1, 1);
       updatedBlocks.splice(destination.index - 1, 0, removedBlocks[0]);
       setBlocks(updatedBlocks);
-      console.log(destination, source);
     },
     [blocks]
   );

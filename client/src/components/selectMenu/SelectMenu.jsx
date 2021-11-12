@@ -64,7 +64,6 @@ class SelectMenu extends React.Component {
   }
 
   componentDidMount() {
-    console.log("mounted select menu");
     document.addEventListener("keydown", this.keyDownHandler);
   }
 
@@ -72,7 +71,6 @@ class SelectMenu extends React.Component {
     const command = this.state.command;
     if (prevState.command !== command) {
       const items = matchSorter(allowedTags, command, { keys: ["tag"] });
-      console.log("found items: " + items);
       this.setState({ items: items });
     }
   }

@@ -3,7 +3,6 @@ import { Spinner } from "@chakra-ui/spinner";
 import React from "react";
 
 export default function Splash() {
-  console.log("rendered placeholder");
   return (
     <Box
       h="100%"

@@ -8,7 +8,6 @@ const RegisterPage = () => {
   const registerGuestUser = useAuth().registerGuest;
 
   const handleRegisterGuest = () => {
-    console.log("register as guest");
     registerGuestUser();
   };
 

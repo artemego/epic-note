@@ -63,7 +63,6 @@ export default function SideBar({ pageId }) {
   const handleModalSaveClick = useCallback(
     async ({ pageTitle }) => {
       // add page запрос на сервер
-      console.log("in handle add page");
       setIsFetching(true);
       const initialBlock = { _id: objectId(), tag: "p", html: "" };
       await notesApi.addPage(accessToken, pageTitle, initialBlock);
@@ -93,7 +92,6 @@ export default function SideBar({ pageId }) {
   // здесь мы просто наверное будем отсылать запрос на обновление страниц, на клиенте обновление уже произойдет в дереве, хотя хз
   const handleUpdatePages = useCallback(
     async (newTree) => {
-      console.log("in update pages");
       notesApi.updatePages(accessToken, newTree);
     },
     [accessToken]
@@ -151,7 +149,6 @@ export default function SideBar({ pageId }) {
             </Box>
             <Divider orientation="horizontal" />
           </Box>
-          {console.log("DATA PAGES: ", data)}
           {isLoading ? (
             <Spinner />
           ) : !data.pages.rootIds.length ? (

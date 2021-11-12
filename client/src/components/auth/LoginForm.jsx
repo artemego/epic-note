@@ -31,7 +31,6 @@ export default function LoginForm() {
   const { error, isLoading } = useAuth().state;
 
   const handleLogin = (data) => {
-    console.log(data);
     login(data);
   };
 

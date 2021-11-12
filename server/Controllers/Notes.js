@@ -11,7 +11,6 @@ module.exports = {
       // Ищем пользователя в базе данных
       const user = await User.findById(userId);
       if (!user) {
-        console.log("in not found");
         throw createHttpError.NotFound("Cannot find user by id");
       }
       // get pages
@@ -28,8 +27,8 @@ module.exports = {
       const userId = req.payload.aud;
       const pageId = req.params.pageId;
       // console.log(JSON.stringify(req.query));
-      console.log("in get page");
-      console.log("pageId" + pageId);
+      // console.log("in get page");
+      // console.log("pageId" + pageId);
 
       // console.log("params: " + JSON.stringify(req.params));
       // console.log("page id" + pageId);
@@ -52,7 +51,6 @@ module.exports = {
     }
   },
   updatePage: async (req, res, next) => {
-    console.log("IN update PAGE");
     try {
       const blocks = req.body.blocks;
       const userId = req.payload.aud;
@@ -110,8 +108,6 @@ module.exports = {
       const userId = req.payload.aud;
       const blocks = req.body.blocks;
       let pageName = req.body.name;
-      console.log(req.body);
-      console.log(pageName);
 
       // Если имя пустое, то имя страницы Untitled
       if (!pageName) pageName = "Untitled";
@@ -188,9 +184,7 @@ module.exports = {
                 return JSON.stringify(child) === deletedPageId;
               });
 
-              console.log(index);
               if (index !== -1) {
-                console.log("splicing");
                 p.children.splice(index, 1);
               }
               // console.log("after deleting children " + p.children);
@@ -200,12 +194,8 @@ module.exports = {
 
           // console.log("previous root ids: " + user.pages.rootIds);
           const newRootIds = user.pages.rootIds.filter((id) => {
-            console.log(id, deletedPageId);
-            console.log(typeof JSON.stringify(id), typeof deletedPageId);
-            console.log(JSON.stringify(id) === deletedPageId);
             return JSON.stringify(id) !== deletedPageId;
           });
-          console.log(newRootIds);
           user.pages.rootIds = newRootIds;
           await user.save();
         }

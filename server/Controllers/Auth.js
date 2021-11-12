@@ -114,20 +114,20 @@ module.exports = {
       );
       res.send({ accessToken, expiresIn });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       next(error);
     }
   },
   login: async (req, res, next) => {
-    console.log(req.body);
+    // console.log(req.body);
     // console.log(req);
     try {
       // проверка на правильность структуры login и password
       const result = await authSchema.validateAsync(req.body);
       // проверка на то, существует ли уже пользователь с данным email. Если нет, то происходит ошибка
       const user = await User.findOne({ email: result.email });
-      console.log(req.body);
-      console.log(result);
+      // console.log(req.body);
+      // console.log(result);
 
       if (!user) throw createHttpError.NotFound("User not registered");
 
@@ -209,7 +209,7 @@ module.exports = {
   info: async (req, res, next) => {
     try {
       const userId = req.payload.aud;
-      console.log(userId);
+      // console.log(userId);
       const user = await User.findById(userId);
       if (!user) {
         const err = new Error("Could not find user by id.");

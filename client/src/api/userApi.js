@@ -23,7 +23,7 @@ async function client(endpoint, method = "POST", accessToken) {
         return;
       }
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       if (response.ok) {
         return data;
       } else {
@@ -36,7 +36,7 @@ async function client(endpoint, method = "POST", accessToken) {
 }
 
 function getUserInfo(accessToken) {
-  console.log("getting user info");
+  // console.log("getting user info");
   return client(INFO, "GET", accessToken);
 }
 

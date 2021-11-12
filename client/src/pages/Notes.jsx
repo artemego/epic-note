@@ -29,15 +29,12 @@ export default function Notes() {
 
   // get blocks for pageId (get new blocks when pageId changes)
   useEffect(() => {
-    console.log("Getting new page");
-    console.log(pageId);
     setIsPageLoading(true);
     if (!pageId || pageId === "login") {
       setIsBlank(true);
     } else {
       setIsBlank(false);
       notesApi.getPage(accessToken, pageId).then((res) => {
-        console.log(res.page);
         setfetchedBlocks(res.page.blocks);
         setIsPageLoading(false);
       });

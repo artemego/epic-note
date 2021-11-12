@@ -23,7 +23,6 @@ async function client(endpoint, data = null, method = "POST", accessToken) {
         return;
       }
       const data = await response.json();
-      console.log(data);
       if (response.ok) {
         return data;
       } else {
@@ -36,27 +35,27 @@ async function client(endpoint, data = null, method = "POST", accessToken) {
 }
 
 function getPages(accessToken) {
-  console.log("getting pages");
+  // console.log("getting pages");
   return client(null, null, "GET", accessToken);
 }
 
 function getPage(accessToken, pageId) {
-  console.log("getting page");
+  // console.log("getting page");
   return client(pageId, null, "GET", accessToken);
 }
 
 function updatePage(accessToken, pageId, blocks) {
-  console.log("updating page on the server");
+  // console.log("updating page on the server");
   return client(pageId, blocks, "PUT", accessToken);
 }
 
 function updatePages(accessToken, newTree) {
-  console.log("updating pages on the server with", newTree);
+  // console.log("updating pages on the server with", newTree);
   return client(null, newTree, "PUT", accessToken);
 }
 
 function addPage(accessToken, pageName, blocks) {
-  console.log("adding page on the server");
+  // console.log("adding page on the server");
   const postData = {
     name: pageName,
     blocks,
@@ -65,7 +64,7 @@ function addPage(accessToken, pageName, blocks) {
 }
 
 function deletePage(accessToken, pageId) {
-  console.log("deleting page on the server");
+  // console.log("deleting page on the server");
   return client(pageId, null, "DELETE", accessToken);
 }
 

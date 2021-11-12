@@ -57,7 +57,6 @@ class EditableBlock extends React.Component {
   }
 
   componentDidMount() {
-    console.log("in did mount of block");
     this.firstRender.current = true;
     const hasPlaceholder = this.addPlaceholder({
       block: this.contentEditable.current,
@@ -109,7 +108,6 @@ class EditableBlock extends React.Component {
   }
 
   forceUpdate() {
-    console.log("forced update");
     this.props.updatePage({
       id: this.props.id,
       html: this.state.html,
@@ -126,7 +124,6 @@ class EditableBlock extends React.Component {
 
   onChangeHandler(e) {
     // Здесь сеттится новый html
-    console.log("in on change");
     this.setState({ html: e.target.value });
   }
 
@@ -138,7 +135,6 @@ class EditableBlock extends React.Component {
 
   // TODO: почему-то когда у нас только два блока на странице и мы переключаемся со страницы, где первый блок - placeholder, срабатывает фокус
   handleFocus() {
-    console.log("in handle focus");
     // If a placeholder is set, we remove it when the block gets focused
     if (this.state.placeholder) {
       this.setState({
@@ -153,7 +149,6 @@ class EditableBlock extends React.Component {
   }
 
   handleBlur(e) {
-    console.log("in handle blur");
     // Показываем placeholder, если после blur все еще единственный и пустой.
     const hasPlaceholder = this.addPlaceholder({
       block: this.contentEditable.current,
@@ -195,10 +190,8 @@ class EditableBlock extends React.Component {
       this.state.previousKey !== "Control" &&
       !this.state.selectMenuIsOpen
     ) {
-      console.log("Previous key " + this.state.previousKey);
       e.preventDefault();
       if (listTags.includes(this.state.tag)) {
-        console.log("detected a list tag");
         this.setState((prevState) => {
           return { html: prevState.html + "<li></li>" };
         });
@@ -213,7 +206,6 @@ class EditableBlock extends React.Component {
 
     // Это будет использоваться для выхода из списков.
     if (e.key === "Enter" && this.state.previousKey === "Control") {
-      console.log("forced enter");
       this.props.addBlock({
         id: this.props.id,
         tag: this.state.tag,
@@ -264,7 +256,6 @@ class EditableBlock extends React.Component {
   }
 
   closeSelectMenuHandler() {
-    console.log("closing select menu");
     this.setState({
       htmlBackup: null,
       selectMenuIsOpen: false,
@@ -275,7 +266,7 @@ class EditableBlock extends React.Component {
 
   openActionMenuHanler(parent, trigger) {
     const { x, y } = this.calculateActionMenuPosition(parent, trigger);
-    console.log(x, y);
+    // console.log(x, y);
 
     this.setState({
       ...this.state,
@@ -297,30 +288,25 @@ class EditableBlock extends React.Component {
     document.removeEventListener("click", this.closeActionMenuHandler, false);
   }
 
-  // мне кажется, что для select menu нам нужно будет совмещать подход action menu с прошлым подходом, чтобы сохранить позицию курсора.
   calculateActionMenuPosition(parent, initiator) {
-    console.log(parent, initiator);
     switch (initiator) {
       case "DRAG_HANDLE_CLICK":
         const x =
           parent.offsetLeft - parent.scrollLeft + parent.clientLeft - 90;
         const y = parent.offsetTop - parent.scrollTop + parent.clientTop + 35;
-        console.log(x, y);
+        // console.log(x, y);
         return { x: x, y: y };
       default:
         return { x: null, y: null };
     }
   }
 
-  // здесь в качестве parent нужно будет передать тот блок, в котором было вызвано меню
-  // TODO: при клике на turn into нужно еще закрывать action menu
   calculateSelectMenuPosition(initiator) {
     switch (initiator) {
       case "KEY_CMD":
         const { x: caretLeft, y: caretTop } = getCaretCoordinates(false);
         return { x: caretLeft, y: caretTop };
       case "ACTION_MENU":
-        console.log("calculating action menu position");
         const { x: actionX, y: actionY } = this.state.actionMenuPosition;
         return { x: actionX - 40, y: actionY - 40 };
       default:
@@ -329,8 +315,8 @@ class EditableBlock extends React.Component {
   }
 
   tagSelectionHandler(tag) {
-    console.log("in tag selectin handler");
-    console.log("is Typing: " + this.state.isTyping);
+    // console.log("in tag selectin handler");
+    // console.log("is Typing: " + this.state.isTyping);
     // is typing - когда мы выбираем с помощью /, остальное - мы выбираем с помощью клика (еще не имплементировано)
     // после обновления тэга нужно обнулять counter, если не происходит выбор btn
     // здесь нам нужно обернуть html в li, если мы переключаемся на li, в той функции как раз производится проверка на li, если они уже там есть, то ничего не произойдет. Просто чтобы на каждом рендере не вызывалось
@@ -363,7 +349,6 @@ class EditableBlock extends React.Component {
   }
 
   handleCounterClick() {
-    console.log("in handle counter");
     this.setState((prevState) => {
       return {
         ...prevState,
@@ -373,7 +358,6 @@ class EditableBlock extends React.Component {
   }
 
   wrapHtmlLi(html, tag) {
-    console.log("in wrap html");
     if (!listTags.includes(tag)) return html;
 
     // на случай, когда переключаемся с пустого toggle
@@ -388,11 +372,9 @@ class EditableBlock extends React.Component {
     // проверка, является ли блок списковым
     if (!listTags.includes(this.state.tag)) return false;
     // Если список, то проверяем html
-    console.log(this.state.html);
     // console.log(this.state.html === "<li><br></li>");
     const listEmpty =
       this.state.html === "<li><br></li>" || this.state.html === "<li></li>";
-    console.log(listEmpty);
     return listEmpty;
   }
 

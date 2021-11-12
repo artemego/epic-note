@@ -41,13 +41,14 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    console.log("Is refreshing: " + isRefreshing);
-  }, [isRefreshing]);
+  // useEffect(() => {
+  //   console.log("Is refreshing: " + isRefreshing);
+  // }, [isRefreshing]);
 
-  useEffect(() => {
-    console.log("Is loading: " + isLoading);
-  }, [isLoading]);
+  // useEffect(() => {
+  //   console.log("Is loading: " + isLoading);
+  // }, [isLoading]);
+
   return (
     <div>
       <QueryClientProvider client={queryClient}>

@@ -29,7 +29,6 @@ export default function RegisterForm() {
   });
 
   const handleRegister = (data) => {
-    console.log(data);
     registerUser(data);
   };
 

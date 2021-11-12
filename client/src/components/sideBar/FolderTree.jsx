@@ -16,7 +16,6 @@ function FolderTree({
   const [tree, setTree] = useState(demoData);
 
   useEffect(() => {
-    console.log("new pages data ", pagesData);
     if (!pagesData) setTree(demoData);
     else setTree(makeTreeObj(pagesData));
   }, [pagesData]);
@@ -50,7 +49,6 @@ function FolderTree({
 
   // это мы будем делать только при первоначальном рендере, добавлении и удалении страницы, при обновлении порядка страниц у нас уже будет правильная структура дерева
   const makeTreeObj = ({ pageItems, rootIds }) => {
-    console.log("making tree obj");
     const rootItem = {
       id: "1",
       children: rootIds,
@@ -78,16 +76,12 @@ function FolderTree({
 
   const onExpand = (itemId) => {
     const updatedTree = mutateTree(tree, itemId, { isExpanded: true });
-
-    console.log("in on expand");
     updateIfTreeChanged(updatedTree);
     setTree(updatedTree);
   };
 
   const onCollapse = (itemId) => {
     const updatedTree = mutateTree(tree, itemId, { isExpanded: false });
-
-    console.log("in on collapse");
     updateIfTreeChanged(updatedTree);
     setTree(updatedTree);
   };
@@ -96,7 +90,6 @@ function FolderTree({
     if (!destination) return;
     const updatedTree = moveItemOnTree(tree, source, destination);
 
-    console.log("in on drag end");
     updateIfTreeChanged(updatedTree);
     setTree(updatedTree);
   };

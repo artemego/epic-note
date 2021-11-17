@@ -27,7 +27,7 @@ export default function SideBar({ pageId }) {
   const [deletingId, setDeletingId] = useState(null);
   const { isOpen, onToggle } = useDisclosure();
   const { logout } = useAuth();
-  const { accessToken, email } = useAuth().state;
+  const { accessToken, email, isLoading: isAuthLoading } = useAuth().state;
   const history = useHistory();
 
   // react-query
@@ -127,6 +127,8 @@ export default function SideBar({ pageId }) {
                 aria-label="Close Control Panel"
                 onClick={handleLogout}
                 colorScheme="orange"
+                disabled={isAuthLoading}
+                isLoading={isAuthLoading}
               >
                 Logout
               </Button>

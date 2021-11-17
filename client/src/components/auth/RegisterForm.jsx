@@ -18,7 +18,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
-export default function RegisterForm() {
+export default function RegisterForm({ prevClicked, error, isLoading }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const { register: registerUser, setError } = useAuth();
@@ -28,14 +28,12 @@ export default function RegisterForm() {
     resolver: yupResolver(userSchema),
   });
 
-  const { error, isLoading } = useAuth().state;
-
   const handleRegister = (data) => {
+    prevClicked.current = "REGISTER";
     registerUser(data);
   };
 
   // при первом рендере надо сбросить прошлую ошибку error(когда переключаемся с другой страницы)
-
   useEffect(() => {
     setError(null);
   }, []);
@@ -124,7 +122,7 @@ export default function RegisterForm() {
           >
             <Button
               type="submit"
-              isLoading={isLoading}
+              isLoading={isLoading && prevClicked.current === "REGISTER"}
               onClick={handleSubmit(handleRegister)}
               colorScheme="orange"
               w="100%"
@@ -132,7 +130,7 @@ export default function RegisterForm() {
                 !!errors.email ||
                 !!errors.password ||
                 errors.confirmPassword ||
-                isLoading === true
+                isLoading
               }
             >
               Register

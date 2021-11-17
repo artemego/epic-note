@@ -31,12 +31,9 @@ export default function SideBar({ pageId }) {
   const history = useHistory();
 
   // react-query
-  const { data, error, isLoading, isError, refetch } = useQuery(
-    "pages",
-    async () => {
-      return await notesApi.getPages(accessToken);
-    }
-  );
+  const { data, isLoading, refetch } = useQuery("pages", async () => {
+    return await notesApi.getPages(accessToken);
+  });
 
   const btnRef = React.useRef();
   const position = isOpen ? "sticky" : "fixed";
@@ -100,7 +97,7 @@ export default function SideBar({ pageId }) {
   return (
     <>
       <div style={{ position: "fixed", left: "5px", top: "5px", zIndex: 100 }}>
-        <Button ref={btnRef} chcolorSeme="orange" onClick={onToggle}>
+        <Button ref={btnRef} colorScheme="orange" onClick={onToggle}>
           Pages <ArrowRightIcon ml="10px" />
         </Button>
       </div>

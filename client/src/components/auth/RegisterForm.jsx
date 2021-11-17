@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import userSchema from "../../schemas/userSchema";
@@ -21,16 +21,24 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
 
-  const registerUser = useAuth().register;
+  const { register: registerUser, setError } = useAuth();
 
   const { register, handleSubmit, errors } = useForm({
     mode: "onBlur",
     resolver: yupResolver(userSchema),
   });
 
+  const { error, isLoading } = useAuth().state;
+
   const handleRegister = (data) => {
     registerUser(data);
   };
+
+  // при первом рендере надо сбросить прошлую ошибку error(когда переключаемся с другой страницы)
+
+  useEffect(() => {
+    setError(null);
+  }, []);
 
   return (
     <>
@@ -73,6 +81,7 @@ export default function RegisterForm() {
               />
               <InputRightElement>
                 <IconButton
+                  aria-label="show password"
                   h="1.75rem"
                   size="sm"
                   mr="1rem"
@@ -98,6 +107,7 @@ export default function RegisterForm() {
               id="confirmPassword"
               name="confirmPassword"
               aria-describedby="confirmPassword-helper-text"
+              autoComplete="off"
               ref={register}
             />
             <FormErrorMessage>
@@ -105,16 +115,30 @@ export default function RegisterForm() {
             </FormErrorMessage>
           </FormControl>
 
-          <Button
-            type="submit"
-            onClick={handleSubmit(handleRegister)}
-            colorScheme="orange"
-            disabled={
-              !!errors.email || !!errors.password || errors.confirmPassword
-            }
+          <FormControl
+            isInvalid={!!error?.message}
+            errortext={error?.message}
+            display="flex"
+            alignItems="center"
+            flexDirection="column"
           >
-            Register
-          </Button>
+            <Button
+              type="submit"
+              isLoading={isLoading}
+              onClick={handleSubmit(handleRegister)}
+              colorScheme="orange"
+              w="100%"
+              disabled={
+                !!errors.email ||
+                !!errors.password ||
+                errors.confirmPassword ||
+                isLoading === true
+              }
+            >
+              Register
+            </Button>
+            <FormErrorMessage>{error?.message}</FormErrorMessage>
+          </FormControl>
         </Stack>
       </form>
     </>

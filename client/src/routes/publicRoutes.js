@@ -1,8 +1,8 @@
 import React from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
-import App from "../App";
-import LoginPage from "../pages/login/LoginPage";
-import RegisterPage from "../pages/register/RegisterPage";
+
+const LoginPage = React.lazy(() => import("../pages/login/LoginPage"));
+const RegisterPage = React.lazy(() => import("../pages/register/RegisterPage"));
 
 // Todo: здесь нужно будет редиректить пользователя, если он не залогинен.
 // Todo: Добавить страницу showcase, которая будет показываться в первый раз незалогиненным пользователям

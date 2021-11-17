@@ -18,21 +18,25 @@ async function client(endpoint, data = null, method = "POST") {
   };
 
   // Todo: catch error
-  return fetch(`${AUTH_URL}/${endpoint}`, config).then(async (response) => {
-    try {
-      if (response.status === 204) {
-        return;
+  try {
+    return fetch(`${AUTH_URL}/${endpoint}`, config).then(async (response) => {
+      try {
+        if (response.status === 204) {
+          return;
+        }
+        const data = await response.json();
+        if (response.ok) {
+          return data;
+        } else {
+          return Promise.reject(data);
+        }
+      } catch (err) {
+        Promise.reject(err);
       }
-      const data = await response.json();
-      if (response.ok) {
-        return data;
-      } else {
-        return Promise.reject(data);
-      }
-    } catch (err) {
-      Promise.reject(err);
-    }
-  });
+    });
+  } catch (err) {
+    console.log("caught error");
+  }
 }
 
 async function login({ email, password }) {

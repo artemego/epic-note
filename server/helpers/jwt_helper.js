@@ -12,7 +12,7 @@ module.exports = {
       // console.log("Expiration time: " + expiresIn);
       const options = {
         expiresIn: "15m",
-        issuer: "https://github.com/burani",
+        issuer: "https://github.com/artemego",
         audience: userId,
       };
 
@@ -56,7 +56,7 @@ module.exports = {
       // Todo: заменить на меньшее время
       const options = {
         expiresIn: "1y",
-        issuer: "https://github.com/burani",
+        issuer: "https://github.com/artemego",
         audience: userId,
       };
 

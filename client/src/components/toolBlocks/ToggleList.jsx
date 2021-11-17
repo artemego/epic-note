@@ -11,7 +11,6 @@ function ToggleList({ children, html }) {
   const liTextRef = useRef(getFirstLiText());
 
   useEffect(() => {
-    const liElementCount = children;
     const newLiText = getFirstLiText();
     liTextRef.current = newLiText;
   }, []);

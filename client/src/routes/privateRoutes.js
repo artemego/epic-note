@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
-import Notes from "../pages/Notes";
+const Notes = React.lazy(() => import("../pages/Notes"));
 
 // Todo: добавить страницы настроек приложения, пользователя, ...
 

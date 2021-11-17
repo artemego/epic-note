@@ -123,10 +123,21 @@ const AuthProvider = ({ children }) => {
         console.error(error);
       });
   };
+  const setError = (error) => {
+    dispatch(ac.setError(error));
+  };
 
   return (
     <AuthContext.Provider
-      value={{ state, login, register, logout, refreshToken, registerGuest }}
+      value={{
+        state,
+        login,
+        register,
+        logout,
+        refreshToken,
+        registerGuest,
+        setError,
+      }}
     >
       {children}
     </AuthContext.Provider>

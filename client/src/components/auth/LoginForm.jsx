@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -26,13 +26,17 @@ export default function LoginForm() {
     resolver: yupResolver(userSchema),
   });
 
-  const { login } = useAuth();
+  const { login, setError } = useAuth();
 
   const { error, isLoading } = useAuth().state;
 
   const handleLogin = (data) => {
     login(data);
   };
+
+  useEffect(() => {
+    setError(null);
+  }, []);
 
   return (
     <>
@@ -71,6 +75,7 @@ export default function LoginForm() {
               />
               <InputRightElement>
                 <IconButton
+                  aria-label="show password"
                   h="1.75rem"
                   size="sm"
                   mr="1rem"

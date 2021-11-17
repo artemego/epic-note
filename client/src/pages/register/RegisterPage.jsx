@@ -12,8 +12,8 @@ const RegisterPage = () => {
   };
 
   return (
-    <>
-      <Box textAlign="center" mt="4rem">
+    <Box mt="4rem" padding="0px 30px">
+      <Box textAlign="center">
         <Heading>Register a new account</Heading>
         <Text>
           Already have an account?{" "}
@@ -22,17 +22,25 @@ const RegisterPage = () => {
         <RegisterForm />
       </Box>
 
-      <Box textAlign="center" mt="20px">
-        <Heading>Try out the application first and register as guest</Heading>
-        <Text>
-          Guests accounts are deleted within a couple of days and you will get
+      <Box
+        textAlign="center"
+        mt="20px"
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+      >
+        <Heading maxWidth="30ch">
+          Try out the application first and register as guest
+        </Heading>
+        <Text maxWidth="60ch">
+          Guests accounts are deleted within a couple of hours and you will get
           some mock data for testing
         </Text>
         <Button colorScheme="orange" mt="20px" onClick={handleRegisterGuest}>
           Register as guest
         </Button>
       </Box>
-    </>
+    </Box>
   );
 };
 

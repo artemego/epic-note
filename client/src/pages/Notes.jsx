@@ -30,7 +30,8 @@ export default function Notes() {
   // get blocks for pageId (get new blocks when pageId changes)
   useEffect(() => {
     setIsPageLoading(true);
-    if (!pageId || pageId === "login") {
+    console.log("page id: ", pageId);
+    if (!pageId || pageId === "login" || pageId === "register") {
       setIsBlank(true);
     } else {
       setIsBlank(false);

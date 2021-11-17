@@ -1,14 +1,16 @@
+import React from "react";
 import { useEffect, useState } from "react";
 import { ChakraProvider } from "@chakra-ui/react";
-import PrivateApp from "./PrivateApp";
-import PublicApp from "./PublicApp";
 import { useAuth } from "./context/AuthContext";
 import { useComponentDidUpdate } from "./hooks/useComponentDidUpdate";
 import { QueryClient, QueryClientProvider } from "react-query";
+import Placeholder from "./components/common/Placeholder";
+const PrivateApp = React.lazy(() => import("./PrivateApp"));
+const PublicApp = React.lazy(() => import("./PublicApp"));
 
 function App() {
   const { refreshToken } = useAuth();
-  const { isAuth, expiryDate, isRefreshing, isLoading } = useAuth().state;
+  const { isAuth, expiryDate } = useAuth().state;
   const [timer, setTimer] = useState(null);
 
   const queryClient = new QueryClient();
@@ -53,7 +55,9 @@ function App() {
     <div>
       <QueryClientProvider client={queryClient}>
         <ChakraProvider>
-          {isAuth ? <PrivateApp /> : <PublicApp />}
+          <React.Suspense fallback={<Placeholder />}>
+            {isAuth ? <PrivateApp /> : <PublicApp />}
+          </React.Suspense>
         </ChakraProvider>
       </QueryClientProvider>
     </div>

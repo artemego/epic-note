@@ -127,7 +127,7 @@ const BlockEditor = ({ pageId, accessToken, fetchedBlocks, isPageLoading }) => {
       if (blocks.length > 1) {
         setCurrentBlockId(currentBlock.id);
         const index = blocks.map((b) => b._id).indexOf(currentBlock.id);
-        const deletedBlock = blocks[index];
+        // const deletedBlock = blocks[index];
         const updatedBlocks = [...blocks];
         updatedBlocks.splice(index, 1);
         setBlocks(updatedBlocks);

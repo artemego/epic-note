@@ -5,11 +5,10 @@ import React from "react";
 export default function Splash() {
   return (
     <Box
-      h="100%"
-      w="100%"
+      h="100vh"
+      display="flex"
       alignItems="center"
       justifyContent="center"
-      display="inline-flex"
       boxSizing="border-box"
     >
       <Spinner

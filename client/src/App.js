@@ -4,7 +4,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { useAuth } from "./context/AuthContext";
 import { useComponentDidUpdate } from "./hooks/useComponentDidUpdate";
 import { QueryClient, QueryClientProvider } from "react-query";
-import Placeholder from "./components/common/Placeholder";
+import Splash from "./components/common/Splash";
 const PrivateApp = React.lazy(() => import("./PrivateApp"));
 const PublicApp = React.lazy(() => import("./PublicApp"));
 
@@ -55,7 +55,7 @@ function App() {
     <div>
       <QueryClientProvider client={queryClient}>
         <ChakraProvider>
-          <React.Suspense fallback={<Placeholder />}>
+          <React.Suspense fallback={<Splash />}>
             {isAuth ? <PrivateApp /> : <PublicApp />}
           </React.Suspense>
         </ChakraProvider>
